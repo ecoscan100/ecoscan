@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>About — EcoScan</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/sman100-logo.png"
+    >
+
+    <!-- GLOBAL STYLE -->
+    <link
+        rel="stylesheet"
+        href="css/style.css?v=20260929-nav-global"
+    >
+
+    <style>
+
+        /* =====================================================
+           ABOUT PAGE
+           ===================================================== */
+
+        .about-page {
+            background: #f5f8f5;
+            color: #1f2d24;
+        }
+
+
+        /* =====================================================
+           HERO
+           ===================================================== */
+
+        .about-hero {
+            position: relative;
+            min-height: 650px;
+            overflow: hidden;
+            background:
+                radial-gradient(
+                    circle at 75% 45%,
+                    rgba(54, 194, 117, 0.18),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 20% 20%,
+                    rgba(109, 214, 151, 0.12),
+                    transparent 28%
+                ),
+                #07130d;
+            display: flex;
+            align-items: center;
+            padding: 90px 8%;
+        }
+
+
+        /* Decorative grid */
+
+        .about-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                );
+            background-size: 55px 55px;
+            pointer-events: none;
+        }
+
+
+        .hero-glow {
+            position: absolute;
+            width: 520px;
+            height: 520px;
+            border-radius: 50%;
+            background: #2fc978;
+            filter: blur(150px);
+            opacity: 0.12;
+            right: 5%;
+            top: 5%;
+        }
+
+
+        .about-hero-content {
+            position: relative;
+            z-index: 5;
+            width: 52%;
+            max-width: 650px;
+        }
+
+
+        .about-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 15px;
+            border: 1px solid
+                rgba(101, 201, 142, 0.28);
+            border-radius: 50px;
+            background:
+                rgba(101, 201, 142, 0.08);
+            color: #65c98e;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+            margin-bottom: 25px;
+        }
+
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #65c98e;
+            box-shadow:
+                0 0 12px #65c98e;
+        }
+
+
+        .about-hero h1 {
+            font-size: clamp(
+                48px,
+                6vw,
+                82px
+            );
+            line-height: 0.98;
+            letter-spacing: -3px;
+            color: #ffffff;
+            margin-bottom: 27px;
+        }
+
+
+        .about-hero h1 span {
+            background:
+                linear-gradient(
+                    100deg,
+                    #65c98e,
+                    #b0f0c9
+                );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+
+        .about-hero-description {
+            max-width: 570px;
+            color: #aab9b0;
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #718179;
+            font-size: 12px;
+        }
+
+
+        .hero-meta-line {
+            width: 35px;
+            height: 1px;
+            background: #65c98e;
+        }
+
+
+        /* =====================================================
+           HERO AI VISUAL
+           ===================================================== */
+
+        .about-hero-visual {
+            position: absolute;
+            right: 6%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 470px;
+            height: 470px;
+            z-index: 3;
+        }
+
+
+        .orb {
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform:
+                translate(-50%, -50%);
+            background:
+                radial-gradient(
+                    circle at 35% 30%,
+                    #d8ffe6 0%,
+                    #65c98e 17%,
+                    #1d8f58 43%,
+                    #082c1b 70%,
+                    #04130b 100%
+                );
+            box-shadow:
+                0 0 40px
+                    rgba(101, 201, 142, 0.28),
+                0 0 100px
+                    rgba(45, 201, 120, 0.12);
+            animation:
+                orbFloat 5s ease-in-out infinite;
+        }
+
+
+        .orb::after {
+            content: "♻";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform:
+                translate(-50%, -53%);
+            font-size: 72px;
+            color: rgba(255,255,255,0.92);
+            font-weight: 300;
+        }
+
+
+        .scan-ring {
+            position: absolute;
+            width: 310px;
+            height: 310px;
+            left: 50%;
+            top: 50%;
+            transform:
+                translate(-50%, -50%);
+            border: 1px solid
+                rgba(101, 201, 142, 0.45);
+            border-radius: 50%;
+            animation:
+                rotateRing 12s linear infinite;
+        }
+
+
+        .scan-ring::before,
+        .scan-ring::after {
+            content: "";
+            position: absolute;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #65c98e;
+            box-shadow:
+                0 0 18px #65c98e;
+        }
+
+
+        .scan-ring::before {
+            top: 23px;
+            left: 58px;
+        }
+
+
+        .scan-ring::after {
+            bottom: 35px;
+            right: 42px;
+        }
+
+
+        .scan-ring-two {
+            position: absolute;
+            width: 390px;
+            height: 390px;
+            left: 50%;
+            top: 50%;
+            transform:
+                translate(-50%, -50%);
+            border: 1px dashed
+                rgba(101, 201, 142, 0.16);
+            border-radius: 50%;
+            animation:
+                rotateRingReverse 18s linear infinite;
+        }
+
+
+        .scan-line {
+            position: absolute;
+            width: 310px;
+            height: 1px;
+            left: 50%;
+            top: 50%;
+            transform:
+                translate(-50%, -50%);
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    #65c98e,
+                    transparent
+                );
+            box-shadow:
+                0 0 15px
+                rgba(101, 201, 142, 0.7);
+            animation:
+                scanMove 3.5s ease-in-out infinite;
+        }
+
+
+        /* =====================================================
+           FLOATING INFO CARDS
+           ===================================================== */
+
+        .floating-card {
+            position: absolute;
+            background:
+                rgba(15, 31, 23, 0.82);
+            border: 1px solid
+                rgba(255,255,255,0.09);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 13px 16px;
+            box-shadow:
+                0 15px 35px
+                rgba(0,0,0,0.25);
+        }
+
+
+        .floating-card-title {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+
+        .floating-card-text {
+            color: #829188;
+            font-size: 10px;
+        }
+
+
+        .card-ai {
+            top: 58px;
+            right: 10px;
+            animation:
+                cardFloat 4s ease-in-out infinite;
+        }
+
+
+        .card-ai .floating-card-title {
+            color: #65c98e;
+        }
+
+
+        .card-location {
+            bottom: 68px;
+            left: 0;
+            animation:
+                cardFloat 5s ease-in-out infinite 0.5s;
+        }
+
+
+        .card-location .floating-card-title {
+            color: #ffffff;
+        }
+
+
+        .card-score {
+            bottom: 25px;
+            right: 25px;
+            animation:
+                cardFloat 4.5s ease-in-out infinite 1s;
+        }
+
+
+        .score-value {
+            color: #65c98e;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+
+        /* =====================================================
+           PROJECT INTRO
+           ===================================================== */
+
+        .project-section {
+            padding: 100px 8%;
+            background: #ffffff;
+        }
+
+
+        .project-container {
+            max-width: 1120px;
+            margin: auto;
+            display: grid;
+            grid-template-columns:
+                1fr 1fr;
+            gap: 70px;
+            align-items: center;
+        }
+
+
+        .section-label {
+            color: #1d8f58;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            margin-bottom: 13px;
+        }
+
+
+        .project-content h2 {
+            font-size: 42px;
+            line-height: 1.12;
+            letter-spacing: -1.5px;
+            margin-bottom: 22px;
+        }
+
+
+        .project-content p {
+            color: #68756d;
+            line-height: 1.85;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+
+        .project-visual {
+            position: relative;
+            min-height: 380px;
+            border-radius: 28px;
+            overflow: hidden;
+            background:
+                radial-gradient(
+                    circle at 70% 30%,
+                    rgba(101,201,142,0.22),
+                    transparent 30%
+                ),
+                #0a1710;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .visual-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(
+                    rgba(101,201,142,0.07) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(101,201,142,0.07) 1px,
+                    transparent 1px
+                );
+            background-size: 35px 35px;
+        }
+
+
+        .visual-main {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+
+        .visual-main-icon {
+            width: 125px;
+            height: 125px;
+            border-radius: 35px;
+            margin: auto auto 20px;
+            background:
+                linear-gradient(
+                    145deg,
+                    #65c98e,
+                    #1d8f58
+                );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 55px;
+            box-shadow:
+                0 20px 50px
+                rgba(29,143,88,0.3);
+        }
+
+
+        .visual-main h3 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+
+        .visual-main p {
+            color: #7e9286;
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           HOW IT WORKS
+           ===================================================== */
+
+        .how-section {
+            padding: 100px 8%;
+            background: #f5f8f5;
+        }
+
+
+        .section-heading {
+            max-width: 700px;
+            margin:
+                0 auto 55px;
+            text-align: center;
+        }
+
+
+        .section-heading h2 {
+            font-size: 40px;
+            letter-spacing: -1px;
+            margin-bottom: 14px;
+        }
+
+
+        .section-heading p {
+            color: #6b776f;
+            line-height: 1.75;
+        }
+
+
+        .steps-grid {
+            max-width: 1120px;
+            margin: auto;
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+            gap: 22px;
+        }
+
+
+        .step-card {
+            position: relative;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 20px;
+            border: 1px solid #e7ece8;
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+
+        .step-card:hover {
+            transform: translateY(-7px);
+            box-shadow:
+                0 20px 45px
+                rgba(30,60,40,0.08);
+        }
+
+
+        .step-number {
+            width: 45px;
+            height: 45px;
+            border-radius: 13px;
+            background: #e9f7ef;
+            color: #1d8f58;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 22px;
+        }
+
+
+        .step-card h3 {
+            font-size: 19px;
+            margin-bottom: 10px;
+        }
+
+
+        .step-card p {
+            color: #718078;
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+
+        /* =====================================================
+           FEATURES
+           ===================================================== */
+
+        .features-section {
+            padding: 100px 8%;
+            background: #ffffff;
+        }
+
+
+        .features-grid {
+            max-width: 1120px;
+            margin: auto;
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+            gap: 20px;
+        }
+
+
+        .feature-card {
+            padding: 30px;
+            border: 1px solid #e7ece8;
+            border-radius: 20px;
+            transition:
+                transform 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #bde5cc;
+        }
+
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: #e9f7ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            margin-bottom: 19px;
+        }
+
+
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 9px;
+        }
+
+
+        .feature-card p {
+            color: #718078;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           MISSION
+           ===================================================== */
+
+        .mission-section {
+            position: relative;
+            overflow: hidden;
+            padding: 110px 8%;
+            text-align: center;
+            background:
+                radial-gradient(
+                    circle at 50% 0%,
+                    rgba(101,201,142,0.2),
+                    transparent 40%
+                ),
+                #07130d;
+        }
+
+
+        .mission-section .section-label {
+            color: #65c98e;
+        }
+
+
+        .mission-section h2 {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto 20px;
+            color: #ffffff;
+            font-size: 46px;
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+        }
+
+
+        .mission-section p {
+            position: relative;
+            max-width: 700px;
+            margin: auto;
+            color: #9aaba0;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+
+        /* =====================================================
+           FOOTER
+           ===================================================== */
+
+        .about-footer {
+            background: #050c08;
+            color: #ffffff;
+            padding: 45px 8% 30px;
+            text-align: center;
+        }
+
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+
+        .footer-school-logo {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+        }
+
+
+        .footer-logo div {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            line-height: 1.1;
+        }
+
+
+        .footer-logo strong {
+            font-size: 14px;
+            color: #ffffff;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+        }
+
+
+        .footer-logo span {
+            font-size: 19px;
+            font-weight: 800;
+            color: #65c98e;
+            margin-top: 3px;
+        }
+
+
+        .footer-description {
+            color: #8c9a92;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+
+        .footer-project {
+            color: #65c98e;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            margin-bottom: 25px;
+        }
+
+
+        .footer-links a {
+            color: #a9b4ad;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+
+        .footer-links a:hover {
+            color: #65c98e;
+        }
+
+
+        .footer-copy {
+            padding-top: 20px;
+            border-top: 1px solid
+                rgba(255,255,255,0.08);
+            color: #68756d;
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           ANIMATIONS
+           ===================================================== */
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform:
+                    translate(-50%, -50%)
+                    scale(1);
+            }
+
+            50% {
+                transform:
+                    translate(-50%, -54%)
+                    scale(1.04);
+            }
+
+        }
+
+
+        @keyframes rotateRing {
+
+            from {
+                transform:
+                    translate(-50%, -50%)
+                    rotate(0deg);
+            }
+
+            to {
+                transform:
+                    translate(-50%, -50%)
+                    rotate(360deg);
+            }
+
+        }
+
+
+        @keyframes rotateRingReverse {
+
+            from {
+                transform:
+                    translate(-50%, -50%)
+                    rotate(360deg);
+            }
+
+            to {
+                transform:
+                    translate(-50%, -50%)
+                    rotate(0deg);
+            }
+
+        }
+
+
+        @keyframes scanMove {
+
+            0%,
+            100% {
+                transform:
+                    translate(-50%, -95px);
+                opacity: 0.15;
+            }
+
+            50% {
+                transform:
+                    translate(-50%, 95px);
+                opacity: 1;
+            }
+
+        }
+
+
+        @keyframes cardFloat {
+
+            0%,
+            100% {
+                transform:
+                    translateY(0);
+            }
+
+            50% {
+                transform:
+                    translateY(-8px);
+            }
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1050px) {
+
+            .about-hero-visual {
+                right: -50px;
+                opacity: 0.65;
+            }
+
+            .about-hero-content {
+                width: 65%;
+            }
+
+        }
+
+
+        @media (max-width: 850px) {
+
+            .about-hero {
+                min-height: auto;
+                flex-direction: column;
+                align-items: stretch;
+                padding:
+                    80px 6%;
+            }
+
+            .about-hero-content {
+                width: 100%;
+                max-width: 650px;
+            }
+
+            .about-hero-visual {
+                position: relative;
+                right: auto;
+                top: auto;
+                transform: none;
+                width: 100%;
+                max-width: 430px;
+                height: 430px;
+                margin:
+                    55px auto 0;
+                opacity: 1;
+            }
+
+            .project-container {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .about-hero {
+                padding:
+                    65px 5%;
+            }
+
+            .about-hero h1 {
+                font-size: 48px;
+                letter-spacing: -2px;
+            }
+
+            .about-hero-description {
+                font-size: 15px;
+            }
+
+            .about-hero-visual {
+                height: 340px;
+                transform: none;
+                margin: 32px auto 0;
+            }
+
+            .project-section,
+            .how-section,
+            .features-section,
+            .mission-section {
+                padding:
+                    70px 5%;
+            }
+
+            .project-content h2,
+            .section-heading h2 {
+                font-size: 31px;
+            }
+
+            .mission-section h2 {
+                font-size: 34px;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <nav>
+
+        <a
+            href="index.html"
+            class="brand"
+        >
+
+            <img
+                src="images/sman100-logo.png"
+                alt="SMAN 100 Jakarta Logo"
+                class="school-logo"
+                onerror="this.style.visibility='hidden';"
+            >
+
+            <div class="brand-text">
+
+                <div class="school-name">
+                    SMAN 100 JAKARTA
+                </div>
+
+                <div class="eco-name">
+                    EcoScan
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="index.html">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="scan.html">
+                    Scan Waste
+                </a>
+            </li>
+
+            <li>
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="map.html">
+                    Impact Map
+                </a>
+            </li>
+
+            <li>
+                <a
+                    href="about.html"
+                    class="active"
+                >
+                    About
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main class="about-page">
+
+
+        <!-- =================================================
+             HERO
+             ================================================= -->
+
+        <section class="about-hero">
+
+            <div class="hero-glow"></div>
+
+
+            <div class="about-hero-content">
+
+                <div class="about-badge">
+
+                    <span class="badge-dot"></span>
+
+                    ABOUT ECOSCAN
+
+                </div>
+
+
+                <h1>
+
+                    Waste smarter.
+                    <br>
+
+                    Live <span>greener.</span>
+
+                </h1>
+
+
+                <p class="about-hero-description">
+
+                    EcoScan transforms the way students
+                    understand and manage waste by combining
+                    artificial intelligence, environmental
+                    awareness, and real-world action.
+
+                </p>
+
+
+                <div class="hero-meta">
+
+                    <span class="hero-meta-line"></span>
+
+                    A School Innovation Project
+
+                    <span>•</span>
+
+                    SMAN 100 Jakarta
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 AI VISUAL
+                 ============================================= -->
+
+            <div class="about-hero-visual">
+
+                <div class="scan-ring-two"></div>
+
+                <div class="scan-ring"></div>
+
+                <div class="scan-line"></div>
+
+                <div class="orb"></div>
+
+
+                <!-- AI CARD -->
+
+                <div class="floating-card card-ai">
+
+                    <div class="floating-card-title">
+                        AI RECOGNITION
+                    </div>
+
+                    <div class="floating-card-text">
+                        Waste analysis active
+                    </div>
+
+                </div>
+
+
+                <!-- LOCATION CARD -->
+
+                <div class="floating-card card-location">
+
+                    <div class="floating-card-title">
+                        📍 IMPACT MAP
+                    </div>
+
+                    <div class="floating-card-text">
+                        Find nearby collection points
+                    </div>
+
+                </div>
+
+
+                <!-- SCORE CARD -->
+
+                <div class="floating-card card-score">
+
+                    <div class="floating-card-title">
+                        ECO SCORE
+                    </div>
+
+                    <div class="score-value">
+                        94%
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PROJECT
+             ================================================= -->
+
+        <section class="project-section">
+
+            <div class="project-container">
+
+
+                <div class="project-content">
+
+                    <div class="section-label">
+                        THE IDEA
+                    </div>
+
+                    <h2>
+                        Technology that turns awareness into action.
+                    </h2>
+
+
+                    <p>
+                        Waste sorting can be confusing.
+                        A simple bottle, container, or piece
+                        of packaging may not always be easy
+                        to classify correctly.
+                    </p>
+
+
+                    <p>
+                        EcoScan was created to make that
+                        decision easier. Users can capture
+                        or upload a waste image and receive
+                        an AI-generated recognition result
+                        together with practical information.
+                    </p>
+
+
+                    <p>
+                        Instead of stopping at identification,
+                        EcoScan connects the result to
+                        responsible waste-management actions
+                        and environmental data.
+                    </p>
+
+                </div>
+
+
+
+                <div class="project-visual">
+
+                    <div class="visual-grid"></div>
+
+
+                    <div class="visual-main">
+
+                        <div class="visual-main-icon">
+                            ♻
+                        </div>
+
+                        <h3>
+                            EcoScan
+                        </h3>
+
+                        <p>
+                            Smart waste identification
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             HOW IT WORKS
+             ================================================= -->
+
+        <section class="how-section">
+
+            <div class="section-heading">
+
+                <div class="section-label">
+                    HOW IT WORKS
+                </div>
+
+                <h2>
+                    From a simple photo to a smarter decision.
+                </h2>
+
+                <p>
+                    EcoScan combines image recognition with
+                    practical waste-management information.
+                </p>
+
+            </div>
+
+
+
+            <div class="steps-grid">
+
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        01
+                    </div>
+
+                    <h3>
+                        Scan
+                    </h3>
+
+                    <p>
+                        Upload a photo or capture an image
+                        of the waste item you want to identify.
+                    </p>
+
+                </div>
+
+
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        02
+                    </div>
+
+                    <h3>
+                        Analyze
+                    </h3>
+
+                    <p>
+                        EcoScan processes the image through
+                        its AI-powered recognition system.
+                    </p>
+
+                </div>
+
+
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        03
+                    </div>
+
+                    <h3>
+                        Take Action
+                    </h3>
+
+                    <p>
+                        Understand the result and use the
+                        recommendation to manage the waste
+                        more responsibly.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             FEATURES
+             ================================================= -->
+
+        <section class="features-section">
+
+            <div class="section-heading">
+
+                <div class="section-label">
+                    THE ECOSCAN SYSTEM
+                </div>
+
+                <h2>
+                    More than just a waste scanner.
+                </h2>
+
+                <p>
+                    EcoScan brings identification,
+                    education, data, and environmental
+                    action together in one platform.
+                </p>
+
+            </div>
+
+
+
+            <div class="features-grid">
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        🤖
+                    </div>
+
+                    <h3>
+                        AI Recognition
+                    </h3>
+
+                    <p>
+                        Analyze waste images with an
+                        AI-powered image recognition system.
+                    </p>
+
+                </div>
+
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        ♻️
+                    </div>
+
+                    <h3>
+                        Smart Sorting
+                    </h3>
+
+                    <p>
+                        Understand waste categories and
+                        recommended disposal approaches.
+                    </p>
+
+                </div>
+
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        📊
+                    </div>
+
+                    <h3>
+                        Eco Dashboard
+                    </h3>
+
+                    <p>
+                        Monitor scans, recycling activity,
+                        environmental indicators, and Eco Score.
+                    </p>
+
+                </div>
+
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        📍
+                    </div>
+
+                    <h3>
+                        Impact Map
+                    </h3>
+
+                    <p>
+                        Discover collection and recycling
+                        points through an interactive map.
+                    </p>
+
+                </div>
+
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        🌱
+                    </div>
+
+                    <h3>
+                        Environmental Impact
+                    </h3>
+
+                    <p>
+                        Turn individual scanning activity
+                        into a bigger picture of environmental action.
+                    </p>
+
+                </div>
+
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        🏫
+                    </div>
+
+                    <h3>
+                        School Innovation
+                    </h3>
+
+                    <p>
+                        A student-focused technology project
+                        developed at SMAN 100 Jakarta.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             MISSION
+             ================================================= -->
+
+        <section class="mission-section">
+
+            <div class="section-label">
+                OUR MISSION
+            </div>
+
+
+            <h2>
+                Make the right waste decision
+                feel simple.
+            </h2>
+
+
+            <p>
+                EcoScan aims to encourage students to
+                understand their waste, make informed
+                decisions, and build everyday habits that
+                contribute to a cleaner and more sustainable
+                environment.
+            </p>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer class="about-footer">
+
+
+        <div class="footer-logo">
+
+            <img
+                src="images/sman100-logo.png"
+                alt="SMAN 100 Jakarta Logo"
+                class="footer-school-logo"
+                onerror="this.style.visibility='hidden';"
+            >
+
+            <div>
+
+                <strong>
+                    SMAN 100 JAKARTA
+                </strong>
+
+                <span>
+                    EcoScan
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <p class="footer-description">
+            Smart waste identification for a cleaner future.
+        </p>
+
+
+        <p class="footer-project">
+            A School Innovation Project by SMAN 100 Jakarta
+        </p>
+
+
+        <div class="footer-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="scan.html">
+                Scan Waste
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="map.html">
+                Impact Map
+            </a>
+
+            <a href="about.html">
+                About
+            </a>
+
+        </div>
+
+
+        <div class="footer-copy">
+
+            ©
+            <span id="currentYear"></span>
+            EcoScan — SMAN 100 Jakarta.
+            All rights reserved.
+
+        </div>
+
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         SCRIPT
+         ===================================================== -->
+
+    <script>
+
+        document.getElementById(
+            "currentYear"
+        ).textContent =
+            new Date().getFullYear();
+
+    </script>
+
+
+</body>
+
+</html>

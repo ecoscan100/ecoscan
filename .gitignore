@@ -1,0 +1,8 @@
+/js/google-maps-config.js
+/supabase/* Project _ EcoScan _ Supabase*
+/certs/
+/_site/
+/.env
+/.env.*
+*.pem
+*.key

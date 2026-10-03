@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard — EcoScan</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/sman100-logo.png"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/style.css?v=20260929-nav-global"
+    >
+
+    <style>
+
+        /* =====================================================
+           DASHBOARD
+           ===================================================== */
+
+        .dashboard-page {
+
+            min-height: 100vh;
+
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    rgba(29,143,88,.13),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 20%,
+                    rgba(67,190,120,.08),
+                    transparent 28%
+                ),
+                #07130e;
+
+            padding:
+                70px 7%
+                90px;
+
+        }
+
+
+        /* =====================================================
+           BACKGROUND GRID
+           ===================================================== */
+
+        .dashboard-page::before {
+
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                );
+
+            background-size: 55px 55px;
+
+            mask-image:
+                linear-gradient(
+                    to bottom,
+                    black,
+                    transparent 90%
+                );
+
+            pointer-events: none;
+
+        }
+
+
+        /* =====================================================
+           AMBIENT GLOW
+           ===================================================== */
+
+        .dashboard-page::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 420px;
+            height: 420px;
+
+            right: -180px;
+            top: 250px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(29,143,88,.10);
+
+            filter: blur(80px);
+
+            pointer-events: none;
+
+        }
+
+
+        .dashboard-inner {
+
+            position: relative;
+
+            z-index: 2;
+
+            max-width: 1450px;
+
+            margin: auto;
+
+        }
+
+
+        /* =====================================================
+           HEADER
+           ===================================================== */
+
+        .dashboard-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-end;
+
+            gap: 30px;
+
+            margin-bottom: 45px;
+
+        }
+
+
+        .dashboard-title-wrap {
+
+            max-width: 700px;
+
+        }
+
+
+        .dashboard-badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding:
+                8px 13px;
+
+            border:
+                1px solid
+                rgba(70,220,130,.20);
+
+            background:
+                rgba(29,143,88,.10);
+
+            border-radius: 999px;
+
+            color:
+                #67e39a;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .dashboard-badge-dot {
+
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #52df8a;
+
+            box-shadow:
+                0 0 12px
+                rgba(82,223,138,.9);
+
+            animation:
+                dashboardPulse
+                2s infinite;
+
+        }
+
+
+        @keyframes dashboardPulse {
+
+            0%,100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .45;
+                transform: scale(.75);
+            }
+
+        }
+
+
+        .dashboard-header h1 {
+
+            margin: 0;
+
+            color: #ffffff;
+
+            font-size:
+                clamp(34px, 4vw, 58px);
+
+            line-height: 1.02;
+
+            letter-spacing:
+                -2px;
+
+        }
+
+
+        .dashboard-header h1 span {
+
+            color: #52d98a;
+
+        }
+
+
+        .dashboard-header p {
+
+            margin:
+                15px 0 0;
+
+            color:
+                #91a49a;
+
+            font-size: 15px;
+
+            line-height: 1.7;
+
+        }
+
+
+        .database-status {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            padding:
+                12px 16px;
+
+            border-radius: 12px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.07);
+
+            background:
+                rgba(255,255,255,.035);
+
+            color:
+                #9eaea5;
+
+            font-size: 12px;
+
+            white-space: nowrap;
+
+            backdrop-filter:
+                blur(14px);
+
+        }
+
+
+        .database-status-dot {
+
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background:
+                #53db8b;
+
+            box-shadow:
+                0 0 12px
+                rgba(83,219,139,.8);
+
+        }
+
+
+        /* =====================================================
+           STATISTICS
+           ===================================================== */
+
+        .stats-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        .stat-card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 25px;
+
+            min-height: 165px;
+
+            border-radius: 22px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.075);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.065),
+                    rgba(255,255,255,.025)
+                );
+
+            box-shadow:
+                0 20px 50px
+                rgba(0,0,0,.18);
+
+            backdrop-filter:
+                blur(18px);
+
+            transition:
+                transform .3s ease,
+                border-color .3s ease,
+                box-shadow .3s ease;
+
+        }
+
+
+        .stat-card:hover {
+
+            transform:
+                translateY(-5px);
+
+            border-color:
+                rgba(76,218,135,.25);
+
+            box-shadow:
+                0 25px 65px
+                rgba(0,0,0,.28),
+                0 0 35px
+                rgba(29,143,88,.08);
+
+        }
+
+
+        .stat-card::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 120px;
+            height: 120px;
+
+            right: -50px;
+            top: -55px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(57,206,119,.09);
+
+            filter:
+                blur(4px);
+
+        }
+
+
+        .stat-top {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            margin-bottom: 22px;
+
+        }
+
+
+        .stat-card h3 {
+
+            margin: 0;
+
+            color:
+                #91a39a;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing:
+                .4px;
+
+            text-transform:
+                uppercase;
+
+        }
+
+
+        .stat-icon {
+
+            width: 38px;
+            height: 38px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius: 11px;
+
+            background:
+                rgba(47,191,112,.11);
+
+            border:
+                1px solid
+                rgba(74,214,132,.12);
+
+            font-size: 17px;
+
+        }
+
+
+        .stat-value {
+
+            color:
+                #ffffff;
+
+            font-size:
+                clamp(28px, 3vw, 37px);
+
+            font-weight: 800;
+
+            letter-spacing:
+                -1px;
+
+        }
+
+
+        .stat-value.green {
+
+            color:
+                #52dc8a;
+
+        }
+
+
+        .stat-description {
+
+            margin-top: 7px;
+
+            color:
+                #6f8177;
+
+            font-size: 12px;
+
+        }
+
+
+        /* =====================================================
+           MAIN GRID
+           ===================================================== */
+
+        .dashboard-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1.45fr 1fr;
+
+            gap: 20px;
+
+        }
+
+
+        .dashboard-card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            border-radius: 24px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.075);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.055),
+                    rgba(255,255,255,.022)
+                );
+
+            box-shadow:
+                0 25px 70px
+                rgba(0,0,0,.20);
+
+            backdrop-filter:
+                blur(20px);
+
+        }
+
+
+        .card-header {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            padding:
+                25px 27px;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.06);
+
+        }
+
+
+        .card-header-left h2 {
+
+            margin: 0;
+
+            color:
+                #ffffff;
+
+            font-size: 18px;
+
+        }
+
+
+        .card-header-left p {
+
+            margin:
+                5px 0 0;
+
+            color:
+                #708178;
+
+            font-size: 12px;
+
+        }
+
+
+        .card-label {
+
+            padding:
+                7px 10px;
+
+            border-radius: 8px;
+
+            color:
+                #65dc96;
+
+            background:
+                rgba(55,205,119,.09);
+
+            border:
+                1px solid
+                rgba(55,205,119,.12);
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing:
+                .8px;
+
+        }
+
+
+        /* =====================================================
+           SCAN LIST
+           ===================================================== */
+
+        #scanList {
+
+            padding:
+                5px 27px 18px;
+
+        }
+
+
+        .scan-item {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap: 15px;
+
+            padding:
+                18px 0;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.055);
+
+            transition:
+                padding .2s ease;
+
+        }
+
+
+        .scan-item:last-child {
+
+            border-bottom:
+                none;
+
+        }
+
+
+        .scan-item:hover {
+
+            padding-left: 5px;
+            padding-right: 5px;
+
+        }
+
+
+        .scan-info {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            gap: 13px;
+
+            min-width: 0;
+
+        }
+
+
+        .scan-icon {
+
+            flex-shrink: 0;
+
+            width: 45px;
+            height: 45px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(45,197,113,.16),
+                    rgba(45,197,113,.06)
+                );
+
+            border:
+                1px solid
+                rgba(70,220,135,.12);
+
+            font-size: 19px;
+
+        }
+
+
+        .scan-name {
+
+            color:
+                #e9f1ed;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            white-space:
+                nowrap;
+
+            overflow:
+                hidden;
+
+            text-overflow:
+                ellipsis;
+
+            max-width: 300px;
+
+        }
+
+
+        .scan-date {
+
+            margin-top: 5px;
+
+            color:
+                #65766d;
+
+            font-size: 11px;
+
+        }
+
+
+        .scan-category {
+
+            flex-shrink: 0;
+
+            padding:
+                7px 11px;
+
+            border-radius: 999px;
+
+            background:
+                rgba(55,205,119,.09);
+
+            border:
+                1px solid
+                rgba(55,205,119,.10);
+
+            color:
+                #58d88e;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+           ===================================================== */
+
+        .empty-state {
+
+            text-align:
+                center;
+
+            padding:
+                45px 20px;
+
+        }
+
+
+        .empty-icon {
+
+            width: 65px;
+            height: 65px;
+
+            margin:
+                0 auto 17px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius: 20px;
+
+            background:
+                rgba(50,198,114,.08);
+
+            border:
+                1px solid
+                rgba(50,198,114,.12);
+
+            font-size: 28px;
+
+        }
+
+
+        .empty-state h3 {
+
+            color:
+                #ffffff;
+
+            margin:
+                0 0 8px;
+
+            font-size: 17px;
+
+        }
+
+
+        .empty-state p {
+
+            color:
+                #75867d;
+
+            font-size: 12px;
+
+            line-height:
+                1.7;
+
+            max-width:
+                430px;
+
+            margin:
+                0 auto 20px;
+
+        }
+
+
+        .scan-button {
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap: 8px;
+
+            background:
+                #1d8f58;
+
+            color:
+                #ffffff;
+
+            text-decoration:
+                none;
+
+            padding:
+                12px 18px;
+
+            border-radius:
+                11px;
+
+            font-size:
+                12px;
+
+            font-weight:
+                800;
+
+            box-shadow:
+                0 10px 30px
+                rgba(29,143,88,.22);
+
+            transition:
+                transform .2s ease,
+                box-shadow .2s ease;
+
+        }
+
+
+        .scan-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 14px 35px
+                rgba(29,143,88,.35);
+
+        }
+
+
+        /* =====================================================
+           IMPACT
+           ===================================================== */
+
+        .impact-content {
+
+            padding:
+                28px;
+
+        }
+
+
+        .impact-item {
+
+            margin-bottom:
+                27px;
+
+        }
+
+
+        .impact-header {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            margin-bottom:
+                10px;
+
+        }
+
+
+        .impact-title {
+
+            color:
+                #a1b0a8;
+
+            font-size:
+                12px;
+
+            font-weight:
+                700;
+
+        }
+
+
+        .impact-percent {
+
+            color:
+                #55da8b;
+
+            font-size:
+                12px;
+
+            font-weight:
+                800;
+
+        }
+
+
+        .progress-container {
+
+            width:
+                100%;
+
+            height:
+                8px;
+
+            background:
+                rgba(255,255,255,.06);
+
+            border-radius:
+                999px;
+
+            overflow:
+                hidden;
+
+        }
+
+
+        .progress-bar {
+
+            height:
+                100%;
+
+            width:
+                0%;
+
+            border-radius:
+                999px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #1d8f58,
+                    #55df8c
+                );
+
+            box-shadow:
+                0 0 15px
+                rgba(60,218,132,.28);
+
+            transition:
+                width 1.2s
+                cubic-bezier(.22,1,.36,1);
+
+        }
+
+
+        /* =====================================================
+           ECO SCORE
+           ===================================================== */
+
+        .eco-score-box {
+
+            position:
+                relative;
+
+            overflow:
+                hidden;
+
+            margin-top:
+                34px;
+
+            padding:
+                23px;
+
+            border-radius:
+                17px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(29,143,88,.13),
+                    rgba(29,143,88,.035)
+                );
+
+            border:
+                1px solid
+                rgba(75,218,133,.12);
+
+        }
+
+
+        .eco-score-box::after {
+
+            content:
+                "♻";
+
+            position:
+                absolute;
+
+            right:
+                18px;
+
+            top:
+                8px;
+
+            color:
+                rgba(82,218,137,.07);
+
+            font-size:
+                80px;
+
+            line-height:
+                1;
+
+        }
+
+
+        .eco-score-header {
+
+            position:
+                relative;
+
+            z-index:
+                2;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            margin-bottom:
+                13px;
+
+        }
+
+
+        .eco-score-header h3 {
+
+            margin:
+                0;
+
+            color:
+                #dce9e1;
+
+            font-size:
+                13px;
+
+        }
+
+
+        .eco-score-value {
+
+            color:
+                #59df91;
+
+            font-size:
+                22px;
+
+            font-weight:
+                800;
+
+        }
+
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .dashboard-status {
+
+            display: flex;
+
+            align-items:
+                center;
+
+            gap: 8px;
+
+            margin-top:
+                18px;
+
+            color:
+                #65776d;
+
+            font-size:
+                11px;
+
+        }
+
+
+        .dashboard-status::before {
+
+            content:
+                "";
+
+            width:
+                6px;
+
+            height:
+                6px;
+
+            border-radius:
+                50%;
+
+            background:
+                #52d989;
+
+            box-shadow:
+                0 0 9px
+                rgba(82,217,137,.7);
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1050px) {
+
+            .stats-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+            .dashboard-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .dashboard-page {
+
+                padding:
+                    45px 5% 70px;
+
+            }
+
+
+            .dashboard-header {
+
+                display:
+                    block;
+
+            }
+
+
+            .database-status {
+
+                display:
+                    inline-flex;
+
+                margin-top:
+                    20px;
+
+            }
+
+
+            .dashboard-header h1 {
+
+                letter-spacing:
+                    -1.3px;
+
+            }
+
+
+            .stats-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .stat-card {
+
+                min-height:
+                    145px;
+
+            }
+
+
+            .card-header {
+
+                padding:
+                    21px;
+
+            }
+
+
+            #scanList {
+
+                padding:
+                    5px 21px 15px;
+
+            }
+
+
+            .impact-content {
+
+                padding:
+                    22px;
+
+            }
+
+
+            .scan-name {
+
+                max-width:
+                    170px;
+
+            }
+
+        }
+
+
+        @media (max-width: 430px) {
+
+            .dashboard-page {
+
+                padding-left:
+                    4%;
+
+                padding-right:
+                    4%;
+
+            }
+
+
+            .dashboard-header h1 {
+
+                font-size:
+                    34px;
+
+            }
+
+
+            .scan-category {
+
+                display:
+                    none;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <nav>
+
+        <a
+            href="index.html"
+            class="brand"
+        >
+
+            <img
+                src="images/sman100-logo.png"
+                alt="SMAN 100 Jakarta Logo"
+                class="school-logo"
+                onerror="this.style.visibility='hidden';"
+            >
+
+            <div class="brand-text">
+
+                <div class="school-name">
+                    SMAN 100 JAKARTA
+                </div>
+
+                <div class="eco-name">
+                    EcoScan
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="index.html">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="scan.html">
+                    Scan Waste
+                </a>
+            </li>
+
+            <li>
+                <a
+                    href="dashboard.html"
+                    class="active"
+                >
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="map.html">
+                    Impact Map
+                </a>
+            </li>
+
+            <li>
+                <a href="about.html">
+                    About
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         DASHBOARD
+         ===================================================== -->
+
+    <main class="dashboard-page">
+
+        <div class="dashboard-inner">
+
+
+            <!-- =================================================
+                 HEADER
+                 ================================================= -->
+
+            <div class="dashboard-header">
+
+
+                <div class="dashboard-title-wrap">
+
+                    <div class="dashboard-badge">
+
+                        <span
+                            class="dashboard-badge-dot"
+                        ></span>
+
+                        LIVE ECO SYSTEM
+
+                    </div>
+
+
+                    <h1>
+                        Your
+                        <span>EcoScan</span>
+                        Dashboard.
+                    </h1>
+
+
+                    <p>
+                        Track your waste scanning activity,
+                        recycling performance, and environmental
+                        impact in one place.
+                    </p>
+
+                </div>
+
+
+                <div class="database-status">
+
+                    <span
+                        class="database-status-dot"
+                    ></span>
+
+                    EcoScan database connected
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 STATISTICS
+                 ================================================= -->
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <h3>
+                            Total Scans
+                        </h3>
+
+                        <div class="stat-icon">
+                            🔍
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="stat-value"
+                        id="totalScans"
+                    >
+                        0
+                    </div>
+
+
+                    <div class="stat-description">
+                        Waste items analyzed
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <h3>
+                            Recyclable Waste
+                        </h3>
+
+                        <div class="stat-icon">
+                            ♻️
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="stat-value green"
+                        id="recyclableWaste"
+                    >
+                        0
+                    </div>
+
+
+                    <div class="stat-description">
+                        Items suitable for recycling
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <h3>
+                            CO₂ Saved
+                        </h3>
+
+                        <div class="stat-icon">
+                            🌱
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="stat-value green"
+                        id="co2Saved"
+                    >
+                        0 kg
+                    </div>
+
+
+                    <div class="stat-description">
+                        Estimated environmental benefit
+                    </div>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+
+                        <h3>
+                            Eco Score
+                        </h3>
+
+                        <div class="stat-icon">
+                            ⚡
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="stat-value green"
+                        id="ecoScore"
+                    >
+                        0
+                    </div>
+
+
+                    <div class="stat-description">
+                        Recycling performance
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 MAIN GRID
+                 ================================================= -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- =============================================
+                     RECENT SCANS
+                     ============================================= -->
+
+                <div class="dashboard-card">
+
+
+                    <div class="card-header">
+
+                        <div class="card-header-left">
+
+                            <h2>
+                                Recent Scans
+                            </h2>
+
+                            <p>
+                                Your latest waste analysis activity
+                            </p>
+
+                        </div>
+
+
+                        <div class="card-label">
+                            ACTIVITY
+                        </div>
+
+                    </div>
+
+
+                    <div id="scanList">
+
+
+                        <div class="empty-state">
+
+                            <div class="empty-icon">
+                                ♻️
+                            </div>
+
+                            <h3>
+                                Loading scans...
+                            </h3>
+
+                            <p>
+                                Loading your waste scanning
+                                history from the EcoScan database.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =============================================
+                     ENVIRONMENTAL IMPACT
+                     ============================================= -->
+
+                <div class="dashboard-card">
+
+
+                    <div class="card-header">
+
+                        <div class="card-header-left">
+
+                            <h2>
+                                Environmental Impact
+                            </h2>
+
+                            <p>
+                                Your current eco performance
+                            </p>
+
+                        </div>
+
+
+                        <div class="card-label">
+                            IMPACT
+                        </div>
+
+                    </div>
+
+
+                    <div class="impact-content">
+
+
+                        <!-- RECYCLING -->
+
+                        <div class="impact-item">
+
+                            <div class="impact-header">
+
+                                <span
+                                    class="impact-title"
+                                >
+                                    Recycling Rate
+                                </span>
+
+                                <span
+                                    class="impact-percent"
+                                    id="recyclingPercent"
+                                >
+                                    0%
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="progress-container"
+                            >
+
+                                <div
+                                    class="progress-bar"
+                                    id="recyclingBar"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- REDUCTION -->
+
+                        <div class="impact-item">
+
+                            <div class="impact-header">
+
+                                <span
+                                    class="impact-title"
+                                >
+                                    Waste Reduction
+                                </span>
+
+                                <span
+                                    class="impact-percent"
+                                    id="reductionPercent"
+                                >
+                                    0%
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="progress-container"
+                            >
+
+                                <div
+                                    class="progress-bar"
+                                    id="reductionBar"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ECO SCORE -->
+
+                        <div class="eco-score-box">
+
+                            <div class="eco-score-header">
+
+                                <h3>
+                                    Overall Eco Score
+                                </h3>
+
+                                <span
+                                    class="eco-score-value"
+                                    id="scorePercent"
+                                >
+                                    0%
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="progress-container"
+                            >
+
+                                <div
+                                    class="progress-bar"
+                                    id="scoreBar"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 DATABASE STATUS
+                 ================================================= -->
+
+            <div
+                class="dashboard-status"
+                id="dashboardStatus"
+            >
+                Loading EcoScan database...
+            </div>
+
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         SUPABASE
+         ===================================================== -->
+
+    <script>
+
+        const SUPABASE_URL =
+            "https://nfajggmjrloccvnvdlke.supabase.co";
+
+
+        const SUPABASE_KEY =
+            "sb_publishable_lbTp0UEIRl24JS4aime6TA_Moz9q037";
+
+
+
+        async function loadDashboard() {
+
+
+            const status =
+                document.getElementById(
+                    "dashboardStatus"
+                );
+
+
+            try {
+
+
+                const response =
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/scans?select=*&order=created_at.desc`,
+                        {
+
+                            headers: {
+
+                                apikey:
+                                    SUPABASE_KEY,
+
+                                Authorization:
+                                    `Bearer ${SUPABASE_KEY}`
+
+                            }
+
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+
+                    const errorText =
+                        await response.text();
+
+
+                    console.error(
+                        "Supabase error:",
+                        response.status,
+                        errorText
+                    );
+
+
+                    throw new Error(
+                        `Supabase request failed: ${response.status}`
+                    );
+
+                }
+
+
+                const scans =
+                    await response.json();
+
+
+                console.log(
+                    "Scan data:",
+                    scans
+                );
+
+
+
+                /* =============================================
+                   TOTAL SCANS
+                   ============================================= */
+
+                const totalScans =
+                    scans.length;
+
+
+                document.getElementById(
+                    "totalScans"
+                ).textContent =
+                    totalScans;
+
+
+
+                /* =============================================
+                   RECYCLABLE WASTE
+                   ============================================= */
+
+                const recyclableCount =
+                    scans.filter(
+                        scan => {
+
+                            const category =
+                                String(
+                                    scan.category || ""
+                                ).toLowerCase();
+
+
+                            return (
+
+                                category.includes(
+                                    "recyclable"
+                                )
+
+                                ||
+
+                                category.includes(
+                                    "recycle"
+                                )
+
+                            );
+
+                        }
+                    ).length;
+
+
+                document.getElementById(
+                    "recyclableWaste"
+                ).textContent =
+                    recyclableCount;
+
+
+
+                /* =============================================
+                   CO2 SAVED
+                   ============================================= */
+
+                const co2Saved =
+                    scans.reduce(
+                        (total, scan) => {
+
+                            return (
+
+                                total +
+
+                                Number(
+                                    scan.co2_saved || 0
+                                )
+
+                            );
+
+                        },
+                        0
+                    );
+
+
+                document.getElementById(
+                    "co2Saved"
+                ).textContent =
+                    `${co2Saved.toFixed(2)} kg`;
+
+
+
+                /* =============================================
+                   ECO SCORE
+                   ============================================= */
+
+                let ecoScore =
+                    0;
+
+
+                if (
+                    totalScans > 0
+                ) {
+
+                    ecoScore =
+                        Math.min(
+                            100,
+                            Math.round(
+                                (
+                                    recyclableCount /
+                                    totalScans
+                                ) * 100
+                            )
+                        );
+
+                }
+
+
+                document.getElementById(
+                    "ecoScore"
+                ).textContent =
+                    ecoScore;
+
+
+
+                /* =============================================
+                   PROGRESS BARS
+                   ============================================= */
+
+                document.getElementById(
+                    "recyclingPercent"
+                ).textContent =
+                    `${ecoScore}%`;
+
+
+                document.getElementById(
+                    "recyclingBar"
+                ).style.width =
+                    `${ecoScore}%`;
+
+
+                document.getElementById(
+                    "reductionPercent"
+                ).textContent =
+                    `${ecoScore}%`;
+
+
+                document.getElementById(
+                    "reductionBar"
+                ).style.width =
+                    `${ecoScore}%`;
+
+
+                document.getElementById(
+                    "scorePercent"
+                ).textContent =
+                    `${ecoScore}%`;
+
+
+                document.getElementById(
+                    "scoreBar"
+                ).style.width =
+                    `${ecoScore}%`;
+
+
+
+                /* =============================================
+                   SCAN LIST
+                   ============================================= */
+
+                const scanList =
+                    document.getElementById(
+                        "scanList"
+                    );
+
+
+                if (
+                    scans.length === 0
+                ) {
+
+
+                    scanList.innerHTML = `
+
+                        <div class="empty-state">
+
+                            <div class="empty-icon">
+                                ♻️
+                            </div>
+
+                            <h3>
+                                No scans yet
+                            </h3>
+
+                            <p>
+                                Your waste scanning history
+                                will appear here after you
+                                analyze your first waste item.
+                            </p>
+
+                            <a
+                                href="scan.html"
+                                class="scan-button"
+                            >
+                                Scan Your First Waste →
+                            </a>
+
+                        </div>
+
+                    `;
+
+
+                } else {
+
+
+                    scanList.innerHTML =
+                        "";
+
+
+                    scans
+                        .slice(0, 5)
+                        .forEach(
+                            scan => {
+
+
+                                const item =
+                                    document.createElement(
+                                        "div"
+                                    );
+
+
+                                item.className =
+                                    "scan-item";
+
+
+                                item.innerHTML = `
+
+                                    <div class="scan-info">
+
+                                        <div class="scan-icon">
+                                            ♻️
+                                        </div>
+
+                                        <div>
+
+                                            <div class="scan-name">
+
+                                                ${
+                                                    scan.waste_name ||
+                                                    "Unknown Waste"
+                                                }
+
+                                            </div>
+
+                                            <div class="scan-date">
+
+                                                ${
+                                                    formatDate(
+                                                        scan.created_at
+                                                    )
+                                                }
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="scan-category">
+
+                                        ${
+                                            scan.category ||
+                                            "Unknown"
+                                        }
+
+                                    </div>
+
+                                `;
+
+
+                                scanList.appendChild(
+                                    item
+                                );
+
+
+                            }
+                        );
+
+
+                }
+
+
+
+                status.textContent =
+                    `${totalScans} scan(s) loaded from EcoScan database.`;
+
+
+            }
+
+
+            catch (error) {
+
+
+                console.error(
+                    "Dashboard error:",
+                    error
+                );
+
+
+                status.textContent =
+                    "Unable to load scan data.";
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           FORMAT DATE
+           ===================================================== */
+
+        function formatDate(
+            dateString
+        ) {
+
+
+            if (
+                !dateString
+            ) {
+
+                return "Unknown date";
+
+            }
+
+
+            const date =
+                new Date(
+                    dateString
+                );
+
+
+            return date.toLocaleDateString(
+                "en-US",
+                {
+
+                    year:
+                        "numeric",
+
+                    month:
+                        "short",
+
+                    day:
+                        "numeric"
+
+                }
+            );
+
+        }
+
+
+
+        /* =====================================================
+           START
+           ===================================================== */
+
+        loadDashboard();
+
+    </script>
+
+
+</body>
+
+</html>

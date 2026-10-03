@@ -1,0 +1,2377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Scan and identify waste using EcoScan AI."
+    >
+
+    <meta
+        name="theme-color"
+        content="#061810"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/sman100-logo.png"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/style.css?v=20260929-nav-global"
+    >
+
+    <title>Scan Waste — EcoScan</title>
+
+    <style>
+
+        .scan-page {
+            position: relative;
+            min-height: calc(100vh - 76px);
+            overflow: hidden;
+            padding: 75px 5% 90px;
+
+            background:
+                radial-gradient(
+                    circle at 15% 5%,
+                    rgba(49, 220, 117, 0.13),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 90% 18%,
+                    rgba(52, 196, 105, 0.11),
+                    transparent 25%
+                ),
+                radial-gradient(
+                    circle at 50% 100%,
+                    rgba(18, 103, 58, 0.18),
+                    transparent 40%
+                ),
+                #061810;
+        }
+
+        .scan-page::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+
+            background-image:
+                linear-gradient(
+                    rgba(85, 230, 139, 0.035) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(85, 230, 139, 0.035) 1px,
+                    transparent 1px
+                );
+
+            background-size: 44px 44px;
+
+            mask-image:
+                linear-gradient(
+                    to bottom,
+                    black,
+                    transparent 92%
+                );
+        }
+
+        .scan-decoration {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            right: -300px;
+            top: -300px;
+
+            border:
+                1px solid
+                rgba(71, 224, 130, 0.12);
+
+            border-radius: 50%;
+
+            box-shadow:
+                0 0 120px
+                rgba(44, 210, 108, 0.08);
+
+            pointer-events: none;
+        }
+
+        .scan-decoration::before {
+            content: "";
+            position: absolute;
+            inset: 75px;
+
+            border:
+                1px solid
+                rgba(71, 224, 130, 0.08);
+
+            border-radius: 50%;
+        }
+
+        .scan-decoration::after {
+            content: "";
+            position: absolute;
+            inset: 155px;
+
+            border:
+                1px solid
+                rgba(71, 224, 130, 0.06);
+
+            border-radius: 50%;
+        }
+
+        .scan-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        .scan-header {
+            max-width: 760px;
+            margin: 0 auto 45px;
+            text-align: center;
+
+            animation:
+                scanFadeUp
+                0.7s
+                cubic-bezier(.22, 1, .36, 1);
+        }
+
+        .scan-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 9px 15px;
+
+            border:
+                1px solid
+                rgba(70, 230, 134, 0.22);
+
+            border-radius: 999px;
+
+            background:
+                rgba(44, 157, 88, 0.12);
+
+            color: #63ed9b;
+
+            font-size: 9px;
+            font-weight: 850;
+            letter-spacing: 1.6px;
+
+            box-shadow:
+                0 0 25px
+                rgba(54, 220, 117, 0.05);
+        }
+
+        .scan-badge::before {
+            content: "";
+
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: #57ed99;
+
+            box-shadow:
+                0 0 12px
+                rgba(87, 237, 153, 0.9);
+
+            animation:
+                scanPulse
+                1.6s
+                infinite;
+        }
+
+        .scan-header h1 {
+            margin: 22px 0 16px;
+
+            color: #ffffff;
+
+            font-size:
+                clamp(
+                    46px,
+                    6vw,
+                    72px
+                );
+
+            line-height: 0.96;
+            letter-spacing: -4px;
+            font-weight: 900;
+        }
+
+        .scan-header h1 span {
+            color: #52e68f;
+
+            text-shadow:
+                0 0 35px
+                rgba(67, 226, 133, 0.16);
+        }
+
+        .scan-header p {
+            max-width: 650px;
+            margin: 0 auto;
+
+            color:
+                rgba(220, 239, 228, 0.68);
+
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .scan-card {
+            position: relative;
+            overflow: hidden;
+
+            padding: 14px;
+
+            border:
+                1px solid
+                rgba(103, 238, 157, 0.13);
+
+            border-radius: 30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(21, 59, 39, 0.92),
+                    rgba(7, 28, 18, 0.96)
+                );
+
+            box-shadow:
+                0 35px 100px
+                rgba(0, 0, 0, 0.34),
+
+                inset 0 1px 0
+                rgba(255,255,255,0.035);
+
+            backdrop-filter: blur(25px);
+
+            animation:
+                scanFadeUp
+                0.8s
+                0.08s
+                cubic-bezier(.22, 1, .36, 1)
+                both;
+        }
+
+        .scan-card::before {
+            content: "";
+
+            position: absolute;
+
+            width: 420px;
+            height: 420px;
+
+            right: -230px;
+            top: -250px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(58, 225, 120, 0.07);
+
+            filter: blur(10px);
+
+            pointer-events: none;
+        }
+
+        .scan-card::after {
+            content: "";
+
+            position: absolute;
+
+            width: 300px;
+            height: 300px;
+
+            left: -180px;
+            bottom: -200px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(35, 166, 91, 0.06);
+
+            pointer-events: none;
+        }
+
+        .upload-area {
+            position: relative;
+
+            min-height: 455px;
+
+            overflow: hidden;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border:
+                1px dashed
+                rgba(95, 226, 140, 0.28);
+
+            border-radius: 23px;
+
+            background:
+                radial-gradient(
+                    circle at 50% 42%,
+                    rgba(58, 223, 118, 0.08),
+                    transparent 42%
+                ),
+
+                rgba(7, 30, 19, 0.82);
+
+            cursor: pointer;
+
+            transition:
+                border-color .3s ease,
+                background .3s ease,
+                transform .3s ease;
+        }
+
+        .upload-area:hover {
+            border-color:
+                rgba(88, 237, 143, 0.58);
+
+            background:
+                radial-gradient(
+                    circle at 50% 42%,
+                    rgba(58, 223, 118, 0.12),
+                    transparent 45%
+                ),
+
+                rgba(8, 36, 22, 0.9);
+
+            transform: translateY(-2px);
+        }
+
+        .upload-area::before {
+            content: "";
+
+            position: absolute;
+            inset: 18px;
+
+            border:
+                1px solid
+                rgba(85, 231, 139, 0.055);
+
+            border-radius: 17px;
+
+            pointer-events: none;
+        }
+
+        .upload-corner {
+            position: absolute;
+
+            width: 36px;
+            height: 36px;
+
+            z-index: 3;
+
+            border-color:
+                rgba(83, 236, 142, 0.55);
+
+            border-style: solid;
+
+            filter:
+                drop-shadow(
+                    0 0 7px
+                    rgba(70, 231, 132, 0.25)
+                );
+        }
+
+        .upload-corner.tl {
+            top: 30px;
+            left: 30px;
+            border-width: 2px 0 0 2px;
+            border-radius: 8px 0 0 0;
+        }
+
+        .upload-corner.tr {
+            top: 30px;
+            right: 30px;
+            border-width: 2px 2px 0 0;
+            border-radius: 0 8px 0 0;
+        }
+
+        .upload-corner.bl {
+            bottom: 30px;
+            left: 30px;
+            border-width: 0 0 2px 2px;
+            border-radius: 0 0 0 8px;
+        }
+
+        .upload-corner.br {
+            bottom: 30px;
+            right: 30px;
+            border-width: 0 2px 2px 0;
+            border-radius: 0 0 8px 0;
+        }
+
+        .upload-scan-line {
+            position: absolute;
+
+            left: 10%;
+            right: 10%;
+            top: 10%;
+
+            height: 1px;
+            z-index: 2;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(82, 239, 145, 0.9),
+                    transparent
+                );
+
+            box-shadow:
+                0 0 18px
+                rgba(82, 239, 145, 0.7);
+
+            animation:
+                idleScan
+                4s
+                ease-in-out
+                infinite;
+
+            pointer-events: none;
+        }
+
+        .upload-content {
+            position: relative;
+
+            z-index: 4;
+
+            padding: 45px 25px;
+
+            text-align: center;
+        }
+
+        .upload-icon {
+            position: relative;
+
+            width: 90px;
+            height: 90px;
+
+            margin: 0 auto 23px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border:
+                1px solid
+                rgba(82, 232, 139, 0.25);
+
+            border-radius: 26px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(54, 199, 108, 0.2),
+                    rgba(25, 104, 60, 0.35)
+                );
+
+            color: #5bea99;
+
+            font-size: 38px;
+
+            box-shadow:
+                0 20px 45px
+                rgba(22, 158, 82, 0.14),
+
+                inset 0 1px 0
+                rgba(255,255,255,0.05);
+
+            animation:
+                iconFloat
+                3s
+                ease-in-out
+                infinite;
+        }
+
+        .upload-icon::before {
+            content: "";
+
+            position: absolute;
+            inset: -10px;
+
+            border:
+                1px solid
+                rgba(73, 225, 132, 0.10);
+
+            border-radius: 31px;
+        }
+
+        .upload-content h2 {
+            margin: 0 0 9px;
+
+            color: #ffffff;
+
+            font-size: 24px;
+            font-weight: 850;
+            letter-spacing: -0.5px;
+        }
+
+        .upload-content p {
+            max-width: 450px;
+
+            margin: 0 auto 28px;
+
+            color:
+                rgba(213, 235, 222, 0.60);
+
+            font-size: 12px;
+            line-height: 1.75;
+        }
+
+        .upload-buttons {
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+        .upload-button,
+        .camera-button {
+            min-height: 47px;
+
+            padding: 12px 20px;
+
+            border-radius: 12px;
+
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 850;
+
+            cursor: pointer;
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                background .25s ease;
+        }
+
+        .upload-button {
+            border:
+                1px solid
+                rgba(93, 236, 145, 0.32);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #137b49,
+                    #2dbb70
+                );
+
+            color: #ffffff;
+
+            box-shadow:
+                0 12px 30px
+                rgba(22, 145, 77, 0.24);
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 16px 35px
+                rgba(22, 177, 91, 0.34);
+        }
+
+        .camera-button {
+            border:
+                1px solid
+                rgba(89, 221, 139, 0.15);
+
+            background:
+                rgba(69, 143, 94, 0.12);
+
+            color: #a9e9c1;
+        }
+
+        .camera-button:hover {
+            transform: translateY(-2px);
+
+            background:
+                rgba(69, 178, 103, 0.18);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* ================= CAMERA ================= */
+
+        .camera-panel {
+            position: relative;
+            z-index: 10;
+
+            width: 100%;
+
+            padding: 24px;
+
+            text-align: center;
+        }
+
+        .camera-wrapper {
+            position: relative;
+
+            width: 100%;
+            max-width: 760px;
+
+            margin: 0 auto;
+
+            overflow: hidden;
+
+            border:
+                1px solid
+                rgba(93, 237, 147, 0.22);
+
+            border-radius: 21px;
+
+            background: #03130b;
+
+            box-shadow:
+                0 25px 70px
+                rgba(0, 0, 0, 0.35);
+        }
+
+        #cameraVideo {
+            width: 100%;
+
+            max-height: 500px;
+
+            min-height: 320px;
+
+            display: block;
+
+            object-fit: cover;
+
+            background: #020b06;
+        }
+
+        .camera-frame {
+            position: absolute;
+
+            inset: 18px;
+
+            z-index: 3;
+
+            border:
+                1px solid
+                rgba(110, 241, 161, 0.18);
+
+            border-radius: 14px;
+
+            pointer-events: none;
+        }
+
+        .camera-frame::before,
+        .camera-frame::after {
+            content: "";
+
+            position: absolute;
+
+            width: 34px;
+            height: 34px;
+
+            border-color: #65eda0;
+
+            border-style: solid;
+
+            opacity: .9;
+        }
+
+        .camera-frame::before {
+            top: -1px;
+            left: -1px;
+
+            border-width: 2px 0 0 2px;
+        }
+
+        .camera-frame::after {
+            right: -1px;
+            bottom: -1px;
+
+            border-width: 0 2px 2px 0;
+        }
+
+        .camera-scan-line {
+            position: absolute;
+
+            left: 10%;
+            right: 10%;
+
+            top: 8%;
+
+            height: 2px;
+
+            z-index: 4;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    #61ef9c,
+                    transparent
+                );
+
+            box-shadow:
+                0 0 20px
+                rgba(97, 239, 156, .9);
+
+            animation:
+                cameraScan 2.7s
+                ease-in-out
+                infinite;
+
+            pointer-events: none;
+        }
+
+        .camera-controls {
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            margin-top: 18px;
+
+            flex-wrap: wrap;
+        }
+
+        .capture-button,
+        .close-camera-button {
+            min-height: 48px;
+
+            padding: 12px 22px;
+
+            border-radius: 12px;
+
+            font-family: inherit;
+
+            font-size: 11px;
+            font-weight: 850;
+
+            cursor: pointer;
+        }
+
+        .capture-button {
+            border:
+                1px solid
+                rgba(93, 236, 145, 0.32);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #137b49,
+                    #2dbb70
+                );
+
+            color: #ffffff;
+
+            box-shadow:
+                0 12px 30px
+                rgba(22, 145, 77, 0.24);
+        }
+
+        .close-camera-button {
+            border:
+                1px solid
+                rgba(89, 221, 139, 0.15);
+
+            background:
+                rgba(69, 143, 94, 0.12);
+
+            color: #a9e9c1;
+        }
+
+        .preview {
+            position: relative;
+
+            z-index: 4;
+
+            width: 100%;
+
+            padding: 24px;
+
+            text-align: center;
+        }
+
+        .preview-image-wrapper {
+            position: relative;
+
+            width: 100%;
+
+            max-width: 700px;
+
+            margin: 0 auto;
+
+            overflow: hidden;
+
+            border:
+                1px solid
+                rgba(93, 237, 147, 0.18);
+
+            border-radius: 21px;
+
+            background: #03130b;
+
+            box-shadow:
+                0 25px 70px
+                rgba(0, 0, 0, 0.35);
+        }
+
+        .preview-image-wrapper::before {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+            top: 0;
+
+            height: 2px;
+
+            z-index: 6;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    #67ee9d,
+                    transparent
+                );
+
+            box-shadow:
+                0 0 18px
+                rgba(103, 238, 157, 0.8);
+
+            animation:
+                previewScan
+                3.1s
+                ease-in-out
+                infinite;
+        }
+
+        #previewImage {
+            width: 100%;
+
+            max-height: 450px;
+
+            min-height: 300px;
+
+            display: block;
+
+            object-fit: contain;
+
+            background: #04150c;
+        }
+
+        .preview-frame {
+            position: absolute;
+
+            inset: 16px;
+
+            z-index: 5;
+
+            border:
+                1px solid
+                rgba(110, 241, 161, 0.14);
+
+            border-radius: 13px;
+
+            pointer-events: none;
+        }
+
+        .preview-frame::before,
+        .preview-frame::after {
+            content: "";
+
+            position: absolute;
+
+            width: 30px;
+            height: 30px;
+
+            border-color: #65eda0;
+            border-style: solid;
+
+            opacity: .8;
+        }
+
+        .preview-frame::before {
+            top: -1px;
+            left: -1px;
+
+            border-width: 2px 0 0 2px;
+        }
+
+        .preview-frame::after {
+            right: -1px;
+            bottom: -1px;
+
+            border-width: 0 2px 2px 0;
+        }
+
+        .file-name {
+            max-width: 700px;
+
+            overflow: hidden;
+
+            margin: 13px auto 0;
+
+            color:
+                rgba(205, 232, 215, 0.60);
+
+            font-size: 10px;
+            font-weight: 700;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .analyze-button {
+            position: relative;
+
+            width: 100%;
+
+            min-height: 60px;
+
+            margin-top: 18px;
+
+            overflow: hidden;
+
+            border:
+                1px solid
+                rgba(73, 233, 136, 0.35);
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #106d40,
+                    #29b86e
+                );
+
+            color: #ffffff;
+
+            font-family: inherit;
+
+            font-size: 13px;
+            font-weight: 850;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 15px 40px
+                rgba(20, 142, 75, 0.25);
+
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                opacity .25s ease;
+        }
+
+        .analyze-button::before {
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: -100%;
+
+            width: 70%;
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255,255,255,0.18),
+                    transparent
+                );
+
+            transform: skewX(-20deg);
+
+            animation:
+                buttonShine
+                4s
+                infinite;
+        }
+
+        .analyze-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 20px 45px
+                rgba(27, 177, 91, 0.35);
+        }
+
+        .analyze-button:disabled {
+            opacity: .65;
+
+            cursor: wait;
+
+            transform: none;
+        }
+
+        .scan-note {
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            margin-top: 15px;
+
+            color:
+                rgba(203, 225, 211, 0.46);
+
+            font-size: 9px;
+            line-height: 1.5;
+
+            text-align: center;
+        }
+
+        .scan-note::before {
+            content: "ⓘ";
+
+            color: #62b982;
+
+            font-size: 11px;
+        }
+
+        .school-project {
+            padding: 0 20px 35px;
+
+            background: #061810;
+
+            color:
+                rgba(202, 225, 211, 0.45);
+
+            font-size: 10px;
+            font-weight: 650;
+
+            text-align: center;
+
+            letter-spacing: .3px;
+        }
+
+        @keyframes scanFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scanPulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .4;
+                transform: scale(.7);
+            }
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+
+        @keyframes idleScan {
+            0% {
+                top: 10%;
+                opacity: 0;
+            }
+
+            15% {
+                opacity: .8;
+            }
+
+            50% {
+                top: 90%;
+                opacity: .8;
+            }
+
+            85% {
+                opacity: .8;
+            }
+
+            100% {
+                top: 10%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes previewScan {
+            0% {
+                top: 4%;
+                opacity: 0;
+            }
+
+            12% {
+                opacity: 1;
+            }
+
+            50% {
+                top: 96%;
+                opacity: 1;
+            }
+
+            88% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 4%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes cameraScan {
+            0% {
+                top: 8%;
+                opacity: 0;
+            }
+
+            15% {
+                opacity: 1;
+            }
+
+            50% {
+                top: 92%;
+                opacity: 1;
+            }
+
+            85% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 8%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes buttonShine {
+            0% {
+                left: -100%;
+            }
+
+            25%, 100% {
+                left: 135%;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .scan-page {
+                padding: 55px 16px 65px;
+            }
+
+            .scan-header {
+                margin-bottom: 30px;
+            }
+
+            .scan-header h1 {
+                font-size: 43px;
+                letter-spacing: -2.5px;
+            }
+
+            .scan-card {
+                padding: 10px;
+                border-radius: 22px;
+            }
+
+            .upload-area {
+                min-height: 350px;
+                border-radius: 18px;
+            }
+
+            .upload-corner {
+                width: 25px;
+                height: 25px;
+            }
+
+            .upload-corner.tl,
+            .upload-corner.tr {
+                top: 22px;
+            }
+
+            .upload-corner.bl,
+            .upload-corner.br {
+                bottom: 22px;
+            }
+
+            .upload-corner.tl,
+            .upload-corner.bl {
+                left: 22px;
+            }
+
+            .upload-corner.tr,
+            .upload-corner.br {
+                right: 22px;
+            }
+
+            .upload-content {
+                padding: 30px 15px;
+            }
+
+            .upload-icon {
+                width: 72px;
+                height: 72px;
+                font-size: 30px;
+            }
+
+            .upload-content h2 {
+                font-size: 19px;
+            }
+
+            .upload-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .upload-button,
+            .camera-button {
+                width: 100%;
+            }
+
+            .camera-panel {
+                padding: 12px;
+            }
+
+            #cameraVideo {
+                min-height: 240px;
+                max-height: 370px;
+            }
+
+            .preview {
+                padding: 12px;
+            }
+
+            #previewImage {
+                min-height: 240px;
+                max-height: 370px;
+            }
+        }
+
+        @media (max-width: 430px) {
+
+            .scan-header h1 {
+                font-size: 37px;
+            }
+
+            .upload-area {
+                min-height: 330px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <nav>
+
+        <a
+            href="index.html"
+            class="brand"
+        >
+
+            <img
+                src="images/sman100-logo.png"
+                alt="SMAN 100 Jakarta Logo"
+                class="school-logo"
+                onerror="this.style.visibility='hidden';"
+            >
+
+            <div class="brand-text">
+
+                <div class="school-name">
+                    SMAN 100 JAKARTA
+                </div>
+
+                <div class="eco-name">
+                    EcoScan
+                </div>
+
+            </div>
+
+        </a>
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="index.html">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a
+                    href="scan.html"
+                    class="active"
+                >
+                    Scan Waste
+                </a>
+            </li>
+
+            <li>
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="map.html">
+                    Impact Map
+                </a>
+            </li>
+
+            <li>
+                <a href="about.html">
+                    About
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+    <main class="scan-page">
+
+        <div class="scan-decoration"></div>
+
+        <div class="scan-container">
+
+            <div class="scan-header">
+
+                <div class="scan-badge">
+                    AI WASTE ANALYSIS
+                </div>
+
+                <h1>
+                    Scan your waste.<br>
+                    <span>Know its impact.</span>
+                </h1>
+
+                <p>
+                    Upload a photo of an object and
+                    EcoScan's AI will analyze the image
+                    and identify what it sees.
+                </p>
+
+            </div>
+
+            <div class="scan-card">
+
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept="image/*"
+                >
+
+                <div
+                    class="upload-area"
+                    id="uploadArea"
+                >
+
+                    <div class="upload-corner tl"></div>
+                    <div class="upload-corner tr"></div>
+                    <div class="upload-corner bl"></div>
+                    <div class="upload-corner br"></div>
+
+                    <div class="upload-scan-line"></div>
+
+                    <div
+                        class="upload-content"
+                        id="uploadContent"
+                    >
+
+                        <div class="upload-icon">
+                            ♻
+                        </div>
+
+                        <h2>
+                            Upload a Waste Image
+                        </h2>
+
+                        <p>
+                            Choose an image from your device
+                            or activate your camera to begin
+                            the AI analysis.
+                        </p>
+
+                        <div class="upload-buttons">
+
+                            <button
+                                type="button"
+                                class="upload-button"
+                                id="chooseImageButton"
+                            >
+                                Choose Image
+                            </button>
+
+                            <button
+                                type="button"
+                                class="camera-button"
+                                id="cameraButton"
+                            >
+                                📷 Camera
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- CAMERA -->
+
+                    <div
+                        class="camera-panel"
+                        id="cameraPanel"
+                        style="display:none;"
+                    >
+
+                        <div class="camera-wrapper">
+
+                            <video
+                                id="cameraVideo"
+                                autoplay
+                                playsinline
+                                muted
+                            ></video>
+
+                            <div class="camera-frame"></div>
+
+                            <div class="camera-scan-line"></div>
+
+                        </div>
+
+                        <div class="camera-controls">
+
+                            <button
+                                type="button"
+                                class="capture-button"
+                                id="captureButton"
+                            >
+                                📸 Capture Photo
+                            </button>
+
+                            <button
+                                type="button"
+                                class="close-camera-button"
+                                id="closeCameraButton"
+                            >
+                                ✕ Close Camera
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <!-- PREVIEW -->
+
+                    <div
+                        class="preview"
+                        id="preview"
+                        style="display:none;"
+                    >
+
+                        <div class="preview-image-wrapper">
+
+                            <img
+                                id="previewImage"
+                                alt="Selected waste image"
+                            >
+
+                            <div class="preview-frame"></div>
+
+                        </div>
+
+                        <div
+                            class="file-name"
+                            id="fileName"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="analyze-button"
+                    id="analyzeButton"
+                >
+                    Analyze Waste →
+                </button>
+
+                <div class="scan-note">
+
+                    AI results are estimates and should be
+                    checked against local waste disposal guidelines.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <div class="school-project">
+
+        A School Innovation Project by SMAN 100 Jakarta
+
+    </div>
+
+    <script>
+
+        /* ==============================
+           SUPABASE
+        ============================== */
+
+        const SUPABASE_URL =
+            "https://nfajggmjrloccvnvdlke.supabase.co";
+
+        const SUPABASE_KEY =
+            "sb_publishable_lbTp0UEIRl24JS4aime6TA_Moz9q037";
+
+        const FUNCTION_URL =
+            `${SUPABASE_URL}/functions/v1/analyze-waste`;
+
+
+        /* ==============================
+           ELEMENTS
+        ============================== */
+
+        const fileInput =
+            document.getElementById("fileInput");
+
+        const uploadArea =
+            document.getElementById("uploadArea");
+
+        const uploadContent =
+            document.getElementById("uploadContent");
+
+        const chooseImageButton =
+            document.getElementById("chooseImageButton");
+
+        const cameraButton =
+            document.getElementById("cameraButton");
+
+        const captureButton =
+            document.getElementById("captureButton");
+
+        const closeCameraButton =
+            document.getElementById("closeCameraButton");
+
+        const analyzeButton =
+            document.getElementById("analyzeButton");
+
+        const preview =
+            document.getElementById("preview");
+
+        const previewImage =
+            document.getElementById("previewImage");
+
+        const fileName =
+            document.getElementById("fileName");
+
+        const cameraPanel =
+            document.getElementById("cameraPanel");
+
+        const cameraVideo =
+            document.getElementById("cameraVideo");
+
+
+        /* ==============================
+           VARIABLES
+        ============================== */
+
+        let selectedFile = null;
+
+        let cameraStream = null;
+
+
+        /* ==============================
+           UPLOAD AREA
+        ============================== */
+
+        uploadArea.addEventListener(
+            "click",
+            function(event) {
+
+                /*
+                 * IMPORTANT:
+                 * Do NOT open file picker if the
+                 * user clicked a button.
+                 */
+
+                if (
+                    event.target.closest("button")
+                ) {
+                    return;
+                }
+
+                openFilePicker();
+
+            }
+        );
+
+
+        /* ==============================
+           CHOOSE IMAGE
+        ============================== */
+
+        chooseImageButton.addEventListener(
+            "click",
+            function(event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                closeCamera();
+
+                fileInput.click();
+
+            }
+        );
+
+
+        /* ==============================
+           CAMERA BUTTON
+        ============================== */
+
+        cameraButton.addEventListener(
+            "click",
+            async function(event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                await openCamera();
+
+            }
+        );
+
+
+        /* ==============================
+           CAPTURE BUTTON
+        ============================== */
+
+        captureButton.addEventListener(
+            "click",
+            function(event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                capturePhoto();
+
+            }
+        );
+
+
+        /* ==============================
+           CLOSE CAMERA BUTTON
+        ============================== */
+
+        closeCameraButton.addEventListener(
+            "click",
+            function(event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                closeCamera();
+
+            }
+        );
+
+
+        /* ==============================
+           ANALYZE BUTTON
+        ============================== */
+
+        analyzeButton.addEventListener(
+            "click",
+            function(event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                analyzeImage();
+
+            }
+        );
+
+
+        /* ==============================
+           FILE PICKER
+        ============================== */
+
+        function openFilePicker() {
+
+            closeCamera();
+
+            fileInput.click();
+
+        }
+
+
+        /* ==============================
+           CAMERA
+        ============================== */
+
+        async function openCamera() {
+
+            if (
+                !navigator.mediaDevices ||
+                !navigator.mediaDevices.getUserMedia
+            ) {
+
+                alert(
+                    "Camera access is not supported by this browser."
+                );
+
+                return;
+
+            }
+
+            try {
+
+                closePreview();
+
+                uploadContent.style.display =
+                    "none";
+
+                preview.style.display =
+                    "none";
+
+                cameraPanel.style.display =
+                    "block";
+
+
+                cameraStream =
+                    await navigator.mediaDevices.getUserMedia({
+
+                        video: {
+
+                            facingMode: {
+                                ideal: "environment"
+                            },
+
+                            width: {
+                                ideal: 1280
+                            },
+
+                            height: {
+                                ideal: 720
+                            }
+
+                        },
+
+                        audio: false
+
+                    });
+
+
+                cameraVideo.srcObject =
+                    cameraStream;
+
+
+                await cameraVideo.play();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Camera error:",
+                    error
+                );
+
+
+                cameraPanel.style.display =
+                    "none";
+
+                uploadContent.style.display =
+                    "block";
+
+
+                if (
+                    error.name ===
+                    "NotAllowedError"
+                ) {
+
+                    alert(
+                        "Camera permission was denied. Please allow camera access in your browser settings."
+                    );
+
+                }
+
+                else if (
+                    error.name ===
+                    "NotFoundError"
+                ) {
+
+                    alert(
+                        "No camera was found on this device."
+                    );
+
+                }
+
+                else if (
+                    error.name ===
+                    "NotReadableError"
+                ) {
+
+                    alert(
+                        "The camera is already being used by another application."
+                    );
+
+                }
+
+                else {
+
+                    alert(
+                        "Unable to access the camera.\n\n" +
+                        error.message
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        /* ==============================
+           CAPTURE PHOTO
+        ============================== */
+
+        function capturePhoto() {
+
+            if (
+                !cameraVideo.videoWidth ||
+                !cameraVideo.videoHeight
+            ) {
+
+                alert(
+                    "Camera is not ready yet. Please wait a moment."
+                );
+
+                return;
+
+            }
+
+
+            const canvas =
+                document.createElement("canvas");
+
+
+            canvas.width =
+                cameraVideo.videoWidth;
+
+            canvas.height =
+                cameraVideo.videoHeight;
+
+
+            const context =
+                canvas.getContext("2d");
+
+
+            context.drawImage(
+                cameraVideo,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+
+            canvas.toBlob(
+                function(blob) {
+
+                    if (!blob) {
+
+                        alert(
+                            "Failed to capture the photo."
+                        );
+
+                        return;
+
+                    }
+
+
+                    selectedFile =
+                        new File(
+                            [blob],
+                            `ecoscan-camera-${Date.now()}.jpg`,
+                            {
+                                type:
+                                    "image/jpeg"
+                            }
+                        );
+
+
+                    const imageURL =
+                        URL.createObjectURL(
+                            selectedFile
+                        );
+
+
+                    previewImage.src =
+                        imageURL;
+
+
+                    fileName.innerText =
+                        selectedFile.name;
+
+
+                    closeCamera();
+
+
+                    preview.style.display =
+                        "block";
+
+                },
+
+                "image/jpeg",
+
+                0.92
+
+            );
+
+        }
+
+
+        /* ==============================
+           CLOSE CAMERA
+        ============================== */
+
+        function closeCamera() {
+
+            if (cameraStream) {
+
+                cameraStream
+                    .getTracks()
+                    .forEach(
+                        function(track) {
+
+                            track.stop();
+
+                        }
+                    );
+
+                cameraStream = null;
+
+            }
+
+
+            cameraVideo.srcObject =
+                null;
+
+
+            cameraPanel.style.display =
+                "none";
+
+
+            if (!selectedFile) {
+
+                uploadContent.style.display =
+                    "block";
+
+            }
+
+        }
+
+
+        /* ==============================
+           CLOSE PREVIEW
+        ============================== */
+
+        function closePreview() {
+
+            preview.style.display =
+                "none";
+
+        }
+
+
+        /* ==============================
+           FILE SELECT
+        ============================== */
+
+        fileInput.addEventListener(
+            "change",
+            function() {
+
+                const file =
+                    this.files[0];
+
+
+                if (!file) {
+
+                    return;
+
+                }
+
+
+                if (
+                    !file.type.startsWith("image/") ||
+                    file.size > 15 * 1024 * 1024
+                ) {
+
+                    alert(
+                        "Choose an image smaller than 15 MB."
+                    );
+
+                    this.value = "";
+                    selectedFile = null;
+                    preview.style.display = "none";
+                    uploadContent.style.display = "block";
+
+                    return;
+
+                }
+
+
+                selectedFile =
+                    file;
+
+
+                const imageURL =
+                    URL.createObjectURL(
+                        file
+                    );
+
+
+                previewImage.src =
+                    imageURL;
+
+
+                fileName.innerText =
+                    file.name;
+
+
+                uploadContent.style.display =
+                    "none";
+
+
+                cameraPanel.style.display =
+                    "none";
+
+
+                preview.style.display =
+                    "block";
+
+            }
+        );
+
+
+        /* ==============================
+           BASE64
+        ============================== */
+
+        function fileToBase64(file) {
+
+            return new Promise(
+                async function(resolve, reject) {
+
+                    let bitmap;
+
+                    try {
+
+                        bitmap =
+                            await createImageBitmap(file);
+
+                        const maxDimension = 1280;
+                        const scale = Math.min(
+                            1,
+                            maxDimension / Math.max(
+                                bitmap.width,
+                                bitmap.height
+                            )
+                        );
+                        const canvas =
+                            document.createElement("canvas");
+
+                        canvas.width =
+                            Math.round(bitmap.width * scale);
+                        canvas.height =
+                            Math.round(bitmap.height * scale);
+
+                        const context =
+                            canvas.getContext("2d");
+
+                        context.drawImage(
+                            bitmap,
+                            0,
+                            0,
+                            canvas.width,
+                            canvas.height
+                        );
+
+                        bitmap.close();
+
+                        canvas.toBlob(
+                            function(blob) {
+
+                                if (!blob) {
+
+                                    reject(
+                                        new Error(
+                                            "Could not prepare this image for analysis."
+                                        )
+                                    );
+
+                                    return;
+
+                                }
+
+                                const reader =
+                                    new FileReader();
+
+                                reader.onload =
+                                    function() {
+                                        resolve(reader.result);
+                                    };
+
+                                reader.onerror =
+                                    function(error) {
+                                        reject(error);
+                                    };
+
+                                reader.readAsDataURL(blob);
+
+                            },
+                            "image/jpeg",
+                            0.72
+                        );
+
+                    } catch (error) {
+
+                        if (bitmap) {
+                            bitmap.close();
+                        }
+
+                        reject(error);
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* ==============================
+           AI ANALYSIS
+        ============================== */
+
+        async function analyzeImage() {
+
+            if (!selectedFile) {
+
+                alert(
+                    "Please select an image first."
+                );
+
+                return;
+
+            }
+
+
+            analyzeButton.disabled =
+                true;
+
+
+            analyzeButton.innerText =
+                "Analyzing with AI...";
+
+
+            try {
+
+                const imageBase64 =
+                    await fileToBase64(
+                        selectedFile
+                    );
+
+
+                const response =
+                    await fetch(
+                        FUNCTION_URL,
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+
+                                "apikey":
+                                    SUPABASE_KEY,
+
+                                "Authorization":
+                                    `Bearer ${SUPABASE_KEY}`,
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    image:
+                                        imageBase64
+
+                                })
+
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.error ||
+                        result.details ||
+                        `AI request failed: ${response.status}`
+                    );
+
+                }
+
+
+                if (
+                    !result.predictions ||
+                    result.predictions.length === 0
+                ) {
+
+                    throw new Error(
+                        "AI returned no predictions."
+                    );
+
+                }
+
+
+                const topPrediction =
+                    result.predictions[0];
+
+
+                const aiLabel =
+                    topPrediction.label ||
+                    "Unknown";
+
+
+                const aiConfidence =
+                    Number(
+                        topPrediction.score || 0
+                    );
+
+
+                const scanResult = {
+
+                    image:
+                        imageBase64,
+
+                    label:
+                        aiLabel,
+
+                    confidence:
+                        aiConfidence,
+
+                    predictions:
+                        result.predictions,
+
+                    fileName:
+                        selectedFile.name
+
+                };
+
+
+                sessionStorage.setItem(
+                    "ecoScanAIResult",
+                    JSON.stringify(
+                        scanResult
+                    )
+                );
+
+
+                window.location.href =
+                    "result.html";
+
+
+            } catch (error) {
+
+                console.error(
+                    "AI analysis failed:",
+                    error
+                );
+
+
+                alert(
+                    "AI analysis failed.\n\n" +
+                    error.message
+                );
+
+
+                analyzeButton.disabled =
+                    false;
+
+
+                analyzeButton.innerText =
+                    "Analyze Waste →";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+name: Deploy EcoScan to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Prepare site files
+        env:
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        run: |
+          if [ -z "$GOOGLE_MAPS_API_KEY" ]; then
+            echo "Add the restricted GOOGLE_MAPS_API_KEY repository secret before deploying."
+            exit 1
+          fi
+
+          mkdir -p _site/js
+          cp index.html about.html dashboard.html map.html result.html scan.html _site/
+          cp -R css images _site/
+          cp js/google-map-adapter.js js/script.js _site/js/
+
+          node -e 'const fs = require("node:fs"); const key = process.env.GOOGLE_MAPS_API_KEY; fs.writeFileSync("_site/js/google-maps-config.js", `window.ECOSCAN_GOOGLE_MAPS_API_KEY = ${JSON.stringify(key)};\nwindow.ECOSCAN_GOOGLE_MAP_ID = "DEMO_MAP_ID";\n`);'
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy site
+        id: deployment
+        uses: actions/deploy-pages@v4

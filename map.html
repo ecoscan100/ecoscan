@@ -1,0 +1,4087 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Impact Map — EcoScan</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/sman100-logo.png"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/style.css?v=20260929-nav-global"
+    >
+
+    <style>
+
+        /* =====================================================
+           MAP PAGE
+           ===================================================== */
+
+        .map-page {
+            min-height: 100vh;
+            background: #f5f8f5;
+            padding-bottom: 90px;
+        }
+
+
+        /* =====================================================
+           HERO
+           ===================================================== */
+
+        .map-hero {
+            position: relative;
+            overflow: hidden;
+            min-height: 420px;
+            padding: 90px 8% 110px;
+
+            background:
+                radial-gradient(
+                    circle at 80% 40%,
+                    rgba(75, 210, 133, 0.18),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 15% 80%,
+                    rgba(49, 160, 98, 0.12),
+                    transparent 28%
+                ),
+                #07130d;
+
+            color: white;
+        }
+
+
+        .map-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                );
+
+            background-size: 55px 55px;
+            pointer-events: none;
+        }
+
+
+        .hero-orb {
+            position: absolute;
+
+            width: 430px;
+            height: 430px;
+
+            right: -100px;
+            top: -140px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(49, 201, 119, 0.14);
+
+            filter: blur(80px);
+        }
+
+
+        .map-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 720px;
+        }
+
+
+        .map-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 9px 15px;
+
+            border-radius: 50px;
+
+            border:
+                1px solid
+                rgba(101, 201, 142, 0.28);
+
+            background:
+                rgba(101, 201, 142, 0.08);
+
+            color: #65c98e;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            letter-spacing: 1.2px;
+
+            margin-bottom: 22px;
+        }
+
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #65c98e;
+
+            box-shadow:
+                0 0 14px
+                #65c98e;
+
+            animation:
+                livePulse 2s infinite;
+        }
+
+
+        .map-hero h1 {
+            font-size:
+                clamp(
+                    48px,
+                    6vw,
+                    78px
+                );
+
+            line-height: 0.98;
+
+            letter-spacing: -3px;
+
+            margin-bottom: 23px;
+        }
+
+
+        .map-hero h1 span {
+            background:
+                linear-gradient(
+                    100deg,
+                    #65c98e,
+                    #c1f5d3
+                );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+
+            color: transparent;
+        }
+
+
+        .map-hero p {
+            max-width: 620px;
+
+            color: #a4b4aa;
+
+            font-size: 16px;
+
+            line-height: 1.8;
+        }
+
+
+        .hero-location {
+            position: absolute;
+
+            right: 10%;
+            bottom: 55px;
+
+            z-index: 3;
+
+            width: 160px;
+            height: 160px;
+
+            border-radius: 50%;
+
+            border:
+                1px solid
+                rgba(101,201,142,0.28);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                rgba(101,201,142,0.04);
+
+            box-shadow:
+                0 0 70px
+                rgba(101,201,142,0.08);
+        }
+
+
+        .hero-location::before {
+            content: "";
+
+            position: absolute;
+
+            width: 110px;
+            height: 110px;
+
+            border-radius: 50%;
+
+            border:
+                1px dashed
+                rgba(101,201,142,0.3);
+
+            animation:
+                spin 12s linear infinite;
+        }
+
+
+        .hero-location-icon {
+            position: relative;
+            z-index: 2;
+
+            font-size: 55px;
+        }
+
+
+        /* =====================================================
+           MAIN CONTENT
+           ===================================================== */
+
+        .map-content {
+            position: relative;
+            z-index: 5;
+
+            width: 84%;
+            max-width: 1250px;
+
+            margin:
+                -55px auto 0;
+        }
+
+
+        /* =====================================================
+           STATS
+           ===================================================== */
+
+        .map-stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 24px;
+        }
+
+
+        .map-stat {
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+                rgba(255,255,255,0.96);
+
+            border:
+                1px solid #e5ebe6;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            box-shadow:
+                0 15px 40px
+                rgba(26, 59, 38, 0.08);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+
+        .map-stat:hover {
+            transform:
+                translateY(-5px);
+
+            box-shadow:
+                0 22px 50px
+                rgba(26, 59, 38, 0.12);
+        }
+
+
+        .map-stat::after {
+            content: "";
+
+            position: absolute;
+
+            width: 100px;
+            height: 100px;
+
+            right: -35px;
+            bottom: -45px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(101,201,142,0.08);
+        }
+
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 17px;
+        }
+
+
+        .map-stat-label {
+            color: #718078;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.8px;
+        }
+
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background:
+                #e9f7ef;
+
+            font-size: 18px;
+        }
+
+
+        .map-stat-value {
+            color: #1d8f58;
+
+            font-size: 34px;
+
+            font-weight: 850;
+
+            letter-spacing: -1px;
+        }
+
+
+        /* =====================================================
+           MAP CARD
+           ===================================================== */
+
+        .map-card {
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+                #101b15;
+
+            border-radius: 26px;
+
+            padding: 12px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.08);
+
+            box-shadow:
+                0 25px 70px
+                rgba(19, 43, 28, 0.18);
+        }
+
+
+        .map-topbar {
+            min-height: 65px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding:
+                5px 15px 12px;
+        }
+
+
+        .map-title-area {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+
+        .map-title-icon {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 11px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                rgba(101,201,142,0.1);
+
+            font-size: 18px;
+        }
+
+
+        .map-title-text strong {
+            display: block;
+
+            color: #ffffff;
+
+            font-size: 14px;
+        }
+
+
+        .map-title-text span {
+            display: block;
+
+            margin-top: 3px;
+
+            color: #718179;
+
+            font-size: 10px;
+        }
+
+
+        .map-live {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            color: #65c98e;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            letter-spacing: 0.8px;
+        }
+
+
+        .map-live-dot {
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: #65c98e;
+
+            box-shadow:
+                0 0 10px
+                #65c98e;
+        }
+
+
+        #map {
+            width: 100%;
+            height: 570px;
+
+            border-radius: 18px;
+
+            overflow: hidden;
+        }
+
+
+        .map-viewport {
+            position: relative;
+        }
+
+
+        /* =====================================================
+           MAP LEGEND
+           ===================================================== */
+
+        .map-legend {
+            position: absolute;
+
+            right: 24px;
+            top: 24px;
+
+            z-index: 1000;
+
+            background:
+                rgba(10, 23, 16, 0.94);
+
+            backdrop-filter:
+                blur(14px);
+
+            -webkit-backdrop-filter:
+                blur(14px);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.09);
+
+            border-radius: 13px;
+
+            padding:
+                12px 15px;
+
+            box-shadow:
+                0 12px 30px
+                rgba(0,0,0,0.2);
+        }
+
+
+        .legend-title {
+            color: #ffffff;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing: 0.8px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .legend-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            color: #8c9b91;
+
+            font-size: 10px;
+
+            margin-top: 7px;
+        }
+
+
+        .legend-marker {
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+
+            flex-shrink: 0;
+        }
+
+
+        .legend-icon {
+            display: grid;
+            place-items: center;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 50%;
+            font-size: 13px;
+            line-height: 1;
+        }
+
+
+        .legend-bank {
+            background: #c37c31;
+            color: #fff;
+        }
+
+
+        .legend-impact-icon {
+            background: #277db7;
+            color: #fff;
+        }
+
+
+        .legend-user-icon {
+            background: #fff;
+            color: #1d8f58;
+        }
+
+
+        .legend-impact {
+            background: #4ab3ff;
+
+            box-shadow:
+                0 0 8px
+                rgba(74,179,255,0.8);
+        }
+
+
+        .legend-user {
+            background: #ffffff;
+
+            border:
+                2px solid #65c98e;
+
+            box-shadow:
+                0 0 8px
+                rgba(101,201,142,0.7);
+        }
+
+
+        /* =====================================================
+           CUSTOM MARKERS
+           ===================================================== */
+
+        .eco-marker {
+            width: 34px;
+            height: 34px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 16px;
+
+            border: 3px solid white;
+
+            box-shadow:
+                0 5px 15px
+                rgba(0,0,0,0.25);
+        }
+
+
+        .waste-bank-marker {
+            background: #c37c31;
+        }
+
+
+        .impact-marker {
+            background: #4ab3ff;
+        }
+
+
+        .user-marker {
+            background: white;
+
+            border:
+                4px solid #65c98e;
+
+            color: #1d8f58;
+
+            box-shadow:
+                0 0 0 7px
+                rgba(101,201,142,0.18),
+                0 6px 18px
+                rgba(0,0,0,0.25);
+        }
+
+
+        /* =====================================================
+           POPUPS
+           ===================================================== */
+
+        .gm-style .gm-style-iw-c {
+            border-radius: 14px;
+        }
+
+
+        .gm-style .gm-style-iw-d {
+            margin: 15px 17px;
+        }
+
+
+        .popup-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1f2d24;
+            margin-bottom: 8px;
+        }
+
+
+        .popup-badge {
+            display: inline-block;
+
+            padding: 4px 8px;
+
+            border-radius: 20px;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: 0.5px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .popup-badge.collection {
+            background: #e5f7ed;
+            color: #248454;
+        }
+
+
+        .popup-badge.impact {
+            background: #e5f2ff;
+            color: #277db7;
+        }
+
+
+        .popup-row {
+            font-size: 12px;
+            color: #5f6b63;
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+
+        .popup-row strong {
+            color: #29362e;
+        }
+
+
+        /* =====================================================
+           MAP CONTROLS
+           ===================================================== */
+
+        .map-controls {
+            display: flex;
+            justify-content: flex-end;
+
+            padding:
+                13px 5px 3px;
+        }
+
+
+        .location-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            border:
+                1px solid
+                rgba(101,201,142,0.2);
+
+            background:
+                rgba(101,201,142,0.1);
+
+            color: #65c98e;
+
+            padding:
+                11px 17px;
+
+            border-radius: 11px;
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            transition:
+                all 0.2s ease;
+        }
+
+
+        .location-button:hover {
+            background:
+                rgba(101,201,142,0.18);
+
+            transform:
+                translateY(-2px);
+        }
+
+
+        .nearby-toolbar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px 6px 12px;
+        }
+
+
+        .nearby-toolbar label {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #aab8ae;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+
+        .nearby-toolbar select {
+            min-height: 40px;
+            border: 1px solid rgba(101,201,142,0.25);
+            border-radius: 8px;
+            padding: 0 34px 0 12px;
+            background-color: #102119;
+            color: #e9f1eb;
+            font-size: 12px;
+        }
+
+
+        .nearby-search-button {
+            min-height: 40px;
+            border: 1px solid rgba(101,201,142,0.3);
+            border-radius: 8px;
+            padding: 0 14px;
+            background: #1d8f58;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+
+        .nearby-search-button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+
+        .nearby-status {
+            flex: 1 1 100%;
+            min-height: 16px;
+            color: #84978a;
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .map-status {
+            padding:
+                0 6px 4px;
+
+            color: #627168;
+
+            font-size: 11px;
+        }
+
+
+        .google-map-error {
+            max-width: 560px;
+            padding: 24px;
+            color: #43554a;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+
+        /* =====================================================
+           FOOTER
+           ===================================================== */
+
+        .map-footer {
+            position: relative;
+
+            overflow: hidden;
+
+            background:
+                #050c08;
+
+            color: #ffffff;
+
+            text-align: center;
+
+            padding:
+                55px 20px 32px;
+        }
+
+
+        .map-footer::before {
+            content: "";
+
+            position: absolute;
+
+            width: 400px;
+            height: 150px;
+
+            left: 50%;
+            top: -100px;
+
+            transform:
+                translateX(-50%);
+
+            border-radius: 50%;
+
+            background:
+                rgba(101,201,142,0.08);
+
+            filter: blur(40px);
+        }
+
+
+        .map-footer-logo {
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            margin-bottom: 16px;
+        }
+
+
+        .map-footer-logo img {
+            width: 42px;
+            height: 42px;
+
+            object-fit: contain;
+        }
+
+
+        .map-footer-brand {
+            display: flex;
+
+            flex-direction: column;
+
+            text-align: left;
+
+            line-height: 1.1;
+        }
+
+
+        .map-footer-brand strong {
+            font-size: 13px;
+
+            color: #ffffff;
+
+            letter-spacing: 0.3px;
+        }
+
+
+        .map-footer-brand span {
+            margin-top: 3px;
+
+            font-size: 19px;
+
+            font-weight: 800;
+
+            color: #65c98e;
+        }
+
+
+        .map-footer p {
+            position: relative;
+
+            color: #74827a;
+
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           ANIMATIONS
+           ===================================================== */
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.7);
+            }
+
+        }
+
+
+        @keyframes spin {
+
+            from {
+                transform:
+                    rotate(0deg);
+            }
+
+            to {
+                transform:
+                    rotate(360deg);
+            }
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .map-hero {
+                padding:
+                    75px 6% 120px;
+            }
+
+
+            .hero-location {
+                opacity: 0.35;
+                right: 2%;
+            }
+
+
+            .map-content {
+                width: 90%;
+            }
+
+
+            .map-stats {
+                grid-template-columns:
+                    1fr;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .map-hero {
+                min-height: 400px;
+
+                padding:
+                    65px 5% 110px;
+            }
+
+
+            .map-hero h1 {
+                font-size: 48px;
+
+                letter-spacing:
+                    -2px;
+            }
+
+
+            .map-hero p {
+                font-size: 14px;
+            }
+
+
+            .hero-location {
+                width: 110px;
+                height: 110px;
+
+                right: 5%;
+                bottom: 30px;
+            }
+
+
+            .hero-location::before {
+                width: 75px;
+                height: 75px;
+            }
+
+
+            .hero-location-icon {
+                font-size: 38px;
+            }
+
+
+            .map-content {
+                width: 94%;
+
+                margin-top:
+                    -45px;
+            }
+
+
+            .map-card {
+                padding: 8px;
+
+                border-radius: 20px;
+            }
+
+
+            .map-topbar {
+                padding:
+                    4px 9px 10px;
+            }
+
+
+            #map {
+                height: 470px;
+
+                border-radius: 14px;
+            }
+
+
+            .map-legend {
+                top: 12px;
+                right: 12px;
+                left: auto;
+                bottom: auto;
+                padding: 10px 12px;
+            }
+
+
+            .nearby-toolbar label {
+                flex: 1 1 100%;
+                justify-content: space-between;
+            }
+
+
+            .nearby-toolbar select {
+                flex: 1;
+                max-width: 190px;
+            }
+
+
+            .map-live {
+                display: none;
+            }
+
+        }
+
+
+        @media (max-width: 450px) {
+
+            .map-hero h1 {
+                font-size: 41px;
+            }
+
+
+            .map-stat {
+                padding: 20px;
+            }
+
+
+            .map-stat-value {
+                font-size: 30px;
+            }
+
+
+            #map {
+                height: 430px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <nav>
+
+        <a
+            href="index.html"
+            class="brand"
+        >
+
+            <img
+                src="images/sman100-logo.png"
+                alt="SMAN 100 Jakarta Logo"
+                class="school-logo"
+                onerror="this.style.visibility='hidden';"
+            >
+
+            <div class="brand-text">
+
+                <div class="school-name">
+                    SMAN 100 JAKARTA
+                </div>
+
+                <div class="eco-name">
+                    EcoScan
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="index.html">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="scan.html">
+                    Scan Waste
+                </a>
+            </li>
+
+            <li>
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a
+                    href="map.html"
+                    class="active"
+                >
+                    Impact Map
+                </a>
+            </li>
+
+            <li>
+                <a href="about.html">
+                    About
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main class="map-page">
+
+
+        <!-- =================================================
+             HERO
+             ================================================= -->
+
+        <section class="map-hero">
+
+            <div class="hero-orb"></div>
+
+
+            <div class="map-hero-content">
+
+                <div class="map-badge">
+
+                    <span class="live-dot"></span>
+
+                    LIVE COMMUNITY MAP
+
+                </div>
+
+
+                <h1>
+
+                    Find where
+                    <br>
+
+                    <span>impact happens.</span>
+
+                </h1>
+
+
+                <p>
+
+                    Search nearby waste banks and review community
+                    environmental actions contributed through EcoScan.
+
+                </p>
+
+            </div>
+
+
+            <div class="hero-location">
+
+                <div class="hero-location-icon">
+                    📍
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CONTENT
+             ================================================= -->
+
+        <div class="map-content">
+
+
+            <!-- =================================================
+                 STATISTICS
+                 ================================================= -->
+
+            <div class="map-stats">
+
+
+                <div class="map-stat">
+
+                    <div class="stat-top">
+
+                        <div class="map-stat-label">
+                            Waste Banks Found
+                        </div>
+
+                        <div class="stat-icon">
+                            📍
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="map-stat-value"
+                        id="wasteBankCount"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+
+                <div class="map-stat">
+
+                    <div class="stat-top">
+
+                        <div class="map-stat-label">
+                            Community Contributions
+                        </div>
+
+                        <div class="stat-icon">
+                            ♻️
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="map-stat-value"
+                        id="communityContributions"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+
+                <div class="map-stat">
+
+                    <div class="stat-top">
+
+                        <div class="map-stat-label">
+                            Recycled Amount
+                        </div>
+
+                        <div class="stat-icon">
+                            🌱
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="map-stat-value"
+                        id="recycledAmount"
+                    >
+                        0 kg
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 MAP
+                 ================================================= -->
+
+            <div class="map-card">
+
+
+                <div class="map-topbar">
+
+                    <div class="map-title-area">
+
+                        <div class="map-title-icon">
+                            🌍
+                        </div>
+
+                        <div class="map-title-text">
+
+                            <strong>
+                                EcoScan Impact Network
+                            </strong>
+
+                            <span>
+                                Nearby waste banks & community impact
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="map-live">
+
+                        <span class="map-live-dot"></span>
+
+                        DATA CONNECTED
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="nearby-toolbar">
+
+                    <label for="wasteBankRadius">
+                        Find waste banks within
+                        <select id="wasteBankRadius">
+                            <option value="5">5 km</option>
+                            <option value="10" selected>10 km</option>
+                            <option value="20">20 km</option>
+                            <option value="50">50 km</option>
+                        </select>
+                    </label>
+
+                    <button
+                        type="button"
+                        class="nearby-search-button"
+                        id="findWasteBanksButton"
+                    >
+                        Search Google Maps
+                    </button>
+
+                    <div
+                        class="nearby-status"
+                        id="wasteBankStatus"
+                        aria-live="polite"
+                    >
+                        Search Google Maps for nearby waste banks and recycling centers.
+                    </div>
+
+                </div>
+
+                <div class="map-viewport">
+
+                    <div id="map"></div>
+
+
+
+                <!-- LEGEND -->
+
+                <div class="map-legend">
+
+                    <div class="legend-title">
+                        MAP LEGEND
+                    </div>
+
+                    <div class="legend-row">
+
+                        <span class="legend-icon legend-bank">🏦</span>
+
+                        Waste Bank / Recycling Point
+
+                    </div>
+
+                    <div class="legend-row">
+
+                        <span class="legend-icon legend-impact-icon">🌱</span>
+
+                        Community Impact
+
+                    </div>
+
+                    <div class="legend-row">
+
+                        <span class="legend-icon legend-user-icon">●</span>
+
+                        My Location
+
+                    </div>
+
+                </div>
+
+                </div>
+
+
+
+                <!-- CONTROLS -->
+
+                <div class="map-controls">
+
+                    <button
+                        class="location-button"
+                        id="findMyLocationButton"
+                    >
+
+                        <span>
+                            📍
+                        </span>
+
+                        My Location
+
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="map-status"
+                    id="mapStatus"
+                >
+                    Loading EcoScan impact data...
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer class="map-footer">
+
+        <div class="map-footer-logo">
+
+            <img
+                src="images/sman100-logo.png"
+                alt="SMAN 100 Jakarta Logo"
+                onerror="this.style.visibility='hidden';"
+            >
+
+
+            <div class="map-footer-brand">
+
+                <strong>
+                    SMAN 100 JAKARTA
+                </strong>
+
+                <span>
+                    EcoScan
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <p>
+            EcoScan — A School Innovation Project by SMAN 100 Jakarta
+        </p>
+
+    </footer>
+
+
+
+    <script src="js/google-maps-config.js"></script>
+    <script src="js/google-map-adapter.js"></script>
+
+    <!-- =====================================================
+         MAP SCRIPT
+         ===================================================== -->
+
+    <script>
+
+        (async function() {
+
+            let googleAdapter;
+
+            try {
+                googleAdapter = await window.EcoGoogleMapAdapter.load();
+            } catch (error) {
+
+                const status =
+                    document.getElementById("wasteBankStatus");
+                const button =
+                    document.getElementById("findWasteBanksButton");
+                const mapElement =
+                    document.getElementById("map");
+                const dataStatus =
+                    document.querySelector(".map-status");
+                const message = document.createElement("div");
+
+                status.textContent = error.message;
+                dataStatus.textContent =
+                    "Google Maps must be configured before the map and community data can load.";
+                button.disabled = true;
+                message.className = "google-map-error";
+                message.textContent = error.message;
+                mapElement.appendChild(message);
+                return;
+
+            }
+
+            const {
+                L,
+                Place,
+                SearchNearbyRankPreference,
+                LatLngBounds
+            } = googleAdapter;
+
+        /* =====================================================
+           SUPABASE
+           ===================================================== */
+
+        const SUPABASE_URL =
+            "https://nfajggmjrloccvnvdlke.supabase.co";
+
+
+        /*
+         * IMPORTANT:
+         * Keep the same publishable/anon key from your project.
+         * Never put a Supabase service-role key in frontend code.
+         */
+
+        const SUPABASE_KEY =
+            "sb_publishable_lbTp0UEIRl24JS4aime6TA_Moz9q037";
+
+
+
+        /* =====================================================
+           CREATE MAP
+           ===================================================== */
+
+        const map =
+            L.map("map").setView(
+                [0, 0],
+                2
+            );
+
+
+        /* =====================================================
+           MARKER LAYERS
+           ===================================================== */
+
+        const impactLayer =
+            L.layerGroup().addTo(map);
+
+
+        const wasteBankLayer =
+            L.layerGroup().addTo(map);
+
+
+        let userMarker = null;
+
+        let userAccuracyCircle = null;
+
+        let searchCenterMarker = null;
+
+        let searchRadiusCircle = null;
+
+        let userSearchRadiusCircle = null;
+
+        let currentUserLocation = null;
+
+        let nextOverpassEndpoint = 1;
+
+        let reverseGeocodeQueue = Promise.resolve();
+
+        let lastReverseGeocodeAt = 0;
+
+        let reverseGeocodeId = 0;
+
+        const reverseGeocodeCache = new Map();
+
+
+
+        /* =====================================================
+           CUSTOM ICONS
+           ===================================================== */
+
+        const wasteBankIcon =
+            L.divIcon({
+
+                className: "",
+
+                html: `
+                    <div class="eco-marker waste-bank-marker">
+                        🏦
+                    </div>
+                `,
+
+                iconSize: [34, 34],
+
+                iconAnchor: [17, 17],
+
+                popupAnchor: [0, -19]
+
+            });
+
+
+        const impactIcon =
+            L.divIcon({
+
+                className: "",
+
+                html: `
+                    <div class="eco-marker impact-marker">
+                        🌱
+                    </div>
+                `,
+
+                iconSize: [34, 34],
+
+                iconAnchor: [17, 17],
+
+                popupAnchor: [0, -19]
+
+            });
+
+
+        const userIcon =
+            L.divIcon({
+
+                className: "",
+
+                html: `
+                    <div class="eco-marker user-marker">
+                        ●
+                    </div>
+                `,
+
+                iconSize: [34, 34],
+
+                iconAnchor: [17, 17],
+
+                popupAnchor: [0, -19]
+
+            });
+
+
+
+        /* =====================================================
+           HELPERS
+           ===================================================== */
+
+        function escapeHTML(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                return "";
+
+            }
+
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+
+        function formatTitle(value) {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+
+                return "Not specified";
+
+            }
+
+
+            return String(value)
+                .replace(/[_-]+/g, " ")
+                .replace(/\s+/g, " ")
+                .trim()
+                .replace(
+                    /\w\S*/g,
+                    word =>
+                        word.charAt(0).toUpperCase() +
+                        word.slice(1).toLowerCase()
+                );
+
+        }
+
+
+
+        function getLatitude(item) {
+
+            return Number(
+                item.latitude ??
+                item.lat ??
+                0
+            );
+
+        }
+
+
+
+        function getLongitude(item) {
+
+            return Number(
+                item.longitude ??
+                item.lng ??
+                item.lon ??
+                0
+            );
+
+        }
+
+
+
+        function getImpactValue(item) {
+
+            /*
+             * The primary field is impact_value.
+             *
+             * Extra fallbacks make the map more tolerant
+             * if your table uses another quantity column.
+             */
+
+            const possibleValues = [
+
+                item.impact_value,
+
+                item.weight,
+
+                item.amount,
+
+                item.quantity,
+
+                item.recycled_amount
+
+            ];
+
+
+            for (
+                const value of possibleValues
+            ) {
+
+                const number =
+                    Number(value);
+
+
+                if (
+                    Number.isFinite(number) &&
+                    number > 0
+                ) {
+
+                    return number;
+
+                }
+
+            }
+
+
+            return 0;
+
+        }
+
+
+
+        function formatDate(value) {
+
+            if (!value) {
+
+                return "Recently";
+
+            }
+
+
+            const date =
+                new Date(value);
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                return "Recently";
+
+            }
+
+
+            return date.toLocaleString(
+                "en-US",
+                {
+                    dateStyle: "medium",
+                    timeStyle: "short"
+                }
+            );
+
+        }
+
+
+
+        /* =====================================================
+           CREATE IMPACT MARKER
+           ===================================================== */
+
+        function createImpactMarker(
+            impact
+        ) {
+
+            const latitude =
+                getLatitude(impact);
+
+
+            const longitude =
+                getLongitude(impact);
+
+
+            if (
+                !Number.isFinite(latitude) ||
+                !Number.isFinite(longitude) ||
+                latitude === 0 ||
+                longitude === 0
+            ) {
+
+                return;
+
+            }
+
+
+            const marker =
+                L.marker(
+                    [
+                        latitude,
+                        longitude
+                    ],
+                    {
+                        icon:
+                            impactIcon
+                    }
+                );
+
+
+            const wasteName =
+                impact.waste_type ||
+                impact.waste_name ||
+                "Waste Item";
+
+
+            const category =
+                impact.category ||
+                "Unknown";
+
+
+            const action =
+                impact.action ||
+                impact.disposal_method ||
+                "Environmental Action";
+
+
+            const locationName =
+                impact.location_name ||
+                "Community Impact";
+
+
+            const impactValue =
+                getImpactValue(
+                    impact
+                );
+
+
+            let amountHTML = "";
+
+
+            if (
+                impactValue > 0
+            ) {
+
+                amountHTML = `
+
+                    <div class="popup-row">
+
+                        <strong>
+                            Impact Amount:
+                        </strong>
+
+                        ${impactValue} kg
+
+                    </div>
+
+                `;
+
+            }
+
+
+            const popupContent = `
+
+                <div>
+
+                    <div class="popup-badge impact">
+                        COMMUNITY IMPACT
+                    </div>
+
+                    <div class="popup-title">
+                        ${escapeHTML(
+                            formatTitle(wasteName)
+                        )}
+                    </div>
+
+
+                    <div class="popup-row">
+
+                        <strong>
+                            Action:
+                        </strong>
+
+                        ${escapeHTML(
+                            formatTitle(action)
+                        )}
+
+                    </div>
+
+
+                    <div class="popup-row">
+
+                        <strong>
+                            Category:
+                        </strong>
+
+                        ${escapeHTML(
+                            formatTitle(category)
+                        )}
+
+                    </div>
+
+
+                    <div class="popup-row">
+
+                        <strong>
+                            Location:
+                        </strong>
+
+                        ${escapeHTML(
+                            locationName
+                        )}
+
+                    </div>
+
+                    ${amountHTML}
+
+
+                    <div class="popup-row">
+
+                        <strong>
+                            Added:
+                        </strong>
+
+                        ${escapeHTML(
+                            formatDate(
+                                impact.created_at
+                            )
+                        )}
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            marker.bindPopup(
+                popupContent
+            );
+
+
+            marker.addTo(
+                impactLayer
+            );
+
+        }
+
+
+
+        /* =====================================================
+           NEARBY WASTE BANKS
+           ===================================================== */
+
+        function getCurrentCoordinates() {
+
+            return new Promise(
+                function(resolve, reject) {
+
+                    const isLocalHost =
+                        location.hostname === "localhost" ||
+                        location.hostname === "127.0.0.1";
+
+                    if (!window.isSecureContext && !isLocalHost) {
+
+                        reject(
+                            new Error(
+                                "Your phone blocks location on this HTTP address. Open EcoScan over HTTPS, or use localhost on this device, then allow location access."
+                            )
+                        );
+
+                        return;
+
+                    }
+
+                    if (!navigator.geolocation) {
+
+                        reject(
+                            new Error(
+                                "Geolocation is not supported by this browser."
+                            )
+                        );
+
+                        return;
+
+                    }
+
+                    let watchId = null;
+                    let settled = false;
+                    let bestPosition = null;
+                    let collectionTimer = null;
+
+                    const finish = function(position, error) {
+
+                        if (settled) {
+                            return;
+                        }
+
+                        settled = true;
+                        clearTimeout(collectionTimer);
+
+                        if (watchId !== null) {
+                            navigator.geolocation.clearWatch(watchId);
+                        }
+
+                        if (position) {
+                            resolve({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy
+                            });
+                        } else {
+                            reject(error);
+                        }
+
+                    };
+
+                    collectionTimer = setTimeout(
+                        function() {
+                            if (bestPosition) {
+                                finish(bestPosition);
+                            } else {
+                                finish(
+                                    null,
+                                    new Error("No location fix was received. Check device location services and try again.")
+                                );
+                            }
+                        },
+                        7000
+                    );
+
+                    try {
+
+                        watchId = navigator.geolocation.watchPosition(
+                            function(position) {
+
+                                if (
+                                    !bestPosition ||
+                                    position.coords.accuracy <
+                                        bestPosition.coords.accuracy
+                                ) {
+                                    bestPosition = position;
+                                }
+
+                                if (position.coords.accuracy <= 25) {
+                                    finish(position);
+                                }
+
+                            },
+                            function(error) {
+                                finish(bestPosition, bestPosition ? null : error);
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 20000,
+                                maximumAge: 0
+                            }
+                        );
+
+                    } catch (error) {
+                        finish(null, error);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function distanceInKm(
+            first,
+            second
+        ) {
+
+            const radians = value =>
+                value * Math.PI / 180;
+            const latitudeDelta =
+                radians(second.latitude - first.latitude);
+            const longitudeDelta =
+                radians(second.longitude - first.longitude);
+            const arc =
+                Math.sin(latitudeDelta / 2) ** 2 +
+                Math.cos(radians(first.latitude)) *
+                Math.cos(radians(second.latitude)) *
+                Math.sin(longitudeDelta / 2) ** 2;
+
+            return 6371 * 2 * Math.atan2(
+                Math.sqrt(arc),
+                Math.sqrt(1 - arc)
+            );
+
+        }
+
+
+        const WASTE_BANK_TERMS_BY_LANGUAGE = {
+            ar: ["تدوير", "إعادة تدوير", "مركز إعادة التدوير"],
+            bn: ["ভাঙারি", "পুনর্ব্যবহার", "বর্জ্য"],
+            bg: ["рециклиране", "пункт за рециклиране", "изкупуване на отпадъци"],
+            cs: ["sběrné suroviny", "recyklační centrum", "sběrný dvůr"],
+            da: ["genbrugsstation", "genbrugsplads", "skrotplads"],
+            de: ["Wertstoffhof", "Recyclinghof", "Schrottplatz"],
+            el: ["ανακύκλωση", "κέντρο ανακύκλωσης", "ανακυκλώσιμα"],
+            en: ["waste bank", "recycling center", "recycling centre"],
+            et: ["jäätmejaam", "jäätmete kogumispunkt", "taaskasutuskeskus"],
+            es: ["reciclaje", "punto limpio", "centro de reciclaje"],
+            fa: ["بازیافت", "ضایعات", "مرکز بازیافت"],
+            fi: ["kierrätyskeskus", "jäteasema", "romuliike"],
+            fr: ["recyclage", "déchetterie", "centre de tri"],
+            gu: ["રિસાયક્લિંગ કેન્દ્ર", "ભંગાર", "કચરો સંગ્રહ કેન્દ્ર"],
+            he: ["מרכז מיחזור", "איסוף פסולת", "מיחזור"],
+            hi: ["कबाड़ी", "कबाड़", "पुनर्चक्रण"],
+            hr: ["reciklažno dvorište", "otkup sekundarnih sirovina", "reciklaža"],
+            hu: ["hulladékudvar", "újrahasznosító központ", "méh telep"],
+            id: [
+                "bank sampah",
+                "bank sampah induk",
+                "bank sampah unit",
+                "bank sampah sekolah",
+                "bank sampah mandiri",
+                "pengepul sampah",
+                "pengepul barang bekas",
+                "daur ulang",
+                "tempat daur ulang",
+                "tempat pengelolaan sampah",
+                "tempat pengolahan sampah",
+                "TPST",
+                "TPS 3R",
+                "TPS3R"
+            ],
+            it: ["isola ecologica", "centro di raccolta", "riciclaggio"],
+            ja: ["リサイクルセンター", "資源回収", "リサイクル"],
+            km: ["មជ្ឈមណ្ឌលកែច្នៃសំរាម", "កន្លែងទិញអេតចាយ", "កែច្នៃឡើងវិញ"],
+            ko: ["고물상", "재활용센터", "재활용"],
+            lo: ["ສູນຣີໄຊເຄິນ", "ຈຸດຮັບຊື້ຂອງເກົ່າ", "ຄັດແຍກຂີ້ເຫຍື້ອ"],
+            lt: ["atliekų surinkimo aikštelė", "perdirbimo centras", "metalo laužas"],
+            lv: ["šķiroto atkritumu laukums", "pārstrādes centrs", "metāllūžņi"],
+            mr: ["कचरा पुनर्वापर केंद्र", "भंगारवाला", "कचरा संकलन केंद्र"],
+            ms: ["pusat kitar semula", "kitar semula", "pusat pengumpulan"],
+            my: ["အမှိုက်ပြန်လည်အသုံးပြုရေး", "အမှိုက်လက်ခံစင်တာ", "ပြန်လည်အသုံးပြုရေးစင်တာ"],
+            nl: ["afvalbrengstation", "recyclingpunt", "afvalinzameling"],
+            no: ["gjenvinningsstasjon", "returpunkt", "skraphandel"],
+            pl: ["punkt recyklingu", "skup surowców wtórnych", "recykling"],
+            pt: ["ecoponto", "centro de reciclagem", "reciclagem"],
+            ro: ["centru de reciclare", "centru de colectare deșeuri", "fier vechi"],
+            ru: ["переработка отходов", "приём вторсырья", "пункт приёма отходов"],
+            si: ["zbirni center odpadkov", "reciklažni center", "odkup odpadnih surovin"],
+            sk: ["zberné suroviny", "recyklačné centrum", "zberný dvor"],
+            sr: ["reciklažni centar", "otkup sekundarnih sirovina", "otkup starog gvožđa"],
+            sw: ["kituo cha kuchakata", "uchakataji", "taka"],
+            sv: ["återvinningscentral", "återvinningsstation", "skrotgård"],
+            ta: ["மறுசுழற்சி மையம்", "பழைய பொருள் வாங்குபவர்", "கழிவு சேகரிப்பு மையம்"],
+            th: ["ธนาคารขยะ", "ศูนย์รีไซเคิล", "รีไซเคิล"],
+            tl: ["junk shop", "recycling center", "basurahan"],
+            te: ["వ్యర్థాల రీసైక్లింగ్ కేంద్రం", "పాత సామాను కొనుగోలు", "చెత్త సేకరణ కేంద్రం"],
+            tr: ["geri dönüşüm", "atık toplama", "hurda"],
+            uk: ["переробка відходів", "пункт прийому вторсировини", "утилізація"],
+            ur: ["کباڑ خانہ", "ری سائیکلنگ مرکز", "فضلہ جمع کرنے کا مرکز"],
+            vi: ["thu mua phế liệu", "điểm thu gom", "tái chế"],
+            zh: ["回收站", "废品回收", "再生资源"]
+        };
+
+        const WASTE_BANK_COUNTRIES_BY_LANGUAGE = {
+            ar: [
+                "AE", "BH", "DZ", "EG", "IQ", "JO", "KW", "LB", "LY",
+                "MA", "MR", "OM", "PS", "QA", "SA", "SD", "SY", "TN", "YE"
+            ],
+            bn: ["BD"],
+            bg: ["BG"],
+            cs: ["CZ"],
+            da: ["DK"],
+            de: ["AT", "CH", "DE", "LI", "LU"],
+            el: ["CY", "GR"],
+            es: [
+                "AR", "BO", "CL", "CO", "CR", "CU", "DO", "EC", "ES",
+                "GT", "HN", "MX", "NI", "PA", "PE", "PR", "PY", "SV", "UY", "VE"
+            ],
+            et: ["EE"],
+            fa: ["AF", "IR"],
+            fi: ["FI"],
+            fr: [
+                "BE", "BF", "BI", "BJ", "CD", "CF", "CG", "CH", "CI", "CM",
+                "DJ", "FR", "GA", "GN", "HT", "LU", "MC", "MG", "ML", "NE",
+                "SN", "TD", "TG"
+            ],
+            hi: ["FJ", "IN"],
+            gu: ["IN"],
+            he: ["IL"],
+            hr: ["HR", "BA"],
+            hu: ["HU"],
+            id: ["ID"],
+            it: ["CH", "IT", "SM", "VA"],
+            ja: ["JP"],
+            km: ["KH"],
+            ko: ["KR", "KP"],
+            lo: ["LA"],
+            lt: ["LT"],
+            lv: ["LV"],
+            mr: ["IN"],
+            ms: ["BN", "MY", "SG"],
+            my: ["MM"],
+            nl: ["BE", "NL", "SR"],
+            no: ["NO"],
+            pl: ["PL"],
+            pt: ["AO", "BR", "CV", "GW", "MZ", "PT", "ST", "TL"],
+            ro: ["RO", "MD"],
+            ru: ["BY", "KZ", "KG", "RU", "TJ"],
+            sw: ["KE", "RW", "TZ", "UG"],
+            si: ["SI"],
+            sk: ["SK"],
+            sr: ["RS", "ME", "BA"],
+            sv: ["SE", "FI"],
+            ta: ["IN", "LK", "SG"],
+            th: ["TH"],
+            tl: ["PH"],
+            te: ["IN"],
+            tr: ["CY", "TR"],
+            uk: ["UA"],
+            ur: ["PK", "IN"],
+            vi: ["VN"],
+            zh: ["CN", "HK", "MO", "SG", "TW"]
+        };
+
+
+        async function getWasteBankSearchLanguages(origin) {
+
+            const languages = [];
+            let regionCode = "";
+            const browserLanguage =
+                String(navigator.language || "")
+                    .split("-")[0]
+                    .toLowerCase();
+
+            try {
+
+                const parameters = new URLSearchParams({
+                    lat: String(origin.latitude),
+                    lon: String(origin.longitude),
+                    lang: "en"
+                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(
+                    () => controller.abort(),
+                    3500
+                );
+                let response;
+
+                try {
+                    response = await fetch(
+                        `https://photon.komoot.io/reverse?${parameters}`,
+                        { signal: controller.signal }
+                    );
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+
+                if (response.ok) {
+
+                    const data = await response.json();
+                    const countryCode = String(
+                        data.features?.[0]?.properties?.countrycode || ""
+                    ).toUpperCase();
+                    regionCode = countryCode.toLowerCase();
+
+                    for (const [language, countryCodes] of Object.entries(
+                        WASTE_BANK_COUNTRIES_BY_LANGUAGE
+                    )) {
+                        if (countryCodes.includes(countryCode)) {
+                            languages.push(language);
+                        }
+                    }
+
+                }
+
+            } catch (error) {
+                // Browser-language terms remain available if country lookup fails.
+
+            }
+
+            if (WASTE_BANK_TERMS_BY_LANGUAGE[browserLanguage]) {
+                languages.push(browserLanguage);
+            }
+
+            const searchLanguages =
+                Array.from(new Set(languages)).slice(0, 3);
+
+            searchLanguages.regionCode = regionCode;
+
+            return searchLanguages;
+
+        }
+
+
+        async function fetchWasteBankData(
+            query,
+            isWorldwide,
+            requestTimeoutMs
+        ) {
+
+            const endpoints = [
+                "https://overpass-api.de/api/interpreter",
+                "https://overpass.kumi.systems/api/interpreter"
+            ];
+            const endpoint = endpoints[nextOverpassEndpoint];
+            nextOverpassEndpoint =
+                (nextOverpassEndpoint + 1) % endpoints.length;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(
+                () => controller.abort(),
+                requestTimeoutMs || (isWorldwide ? 30000 : 8000)
+            );
+
+            try {
+
+                const response = await fetch(
+                    endpoint,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded;charset=UTF-8"
+                        },
+                        body: new URLSearchParams({
+                            data: query
+                        }),
+                        signal: controller.signal
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `OpenStreetMap search returned HTTP ${response.status}.`
+                    );
+                }
+
+                return await response.json();
+
+            } finally {
+
+                clearTimeout(timeoutId);
+
+            }
+
+        }
+
+
+        async function fetchPhotonWasteBanks(
+            origin,
+            radiusKm,
+            knownLanguages
+        ) {
+
+            const latitudeDelta = radiusKm / 111;
+            const longitudeDelta = Math.min(
+                180,
+                radiusKm /
+                    (111 * Math.max(
+                        0.1,
+                        Math.cos(origin.latitude * Math.PI / 180)
+                    ))
+            );
+            const minLongitude = Math.max(
+                -180,
+                origin.longitude - longitudeDelta
+            );
+            const maxLongitude = Math.min(
+                180,
+                origin.longitude + longitudeDelta
+            );
+            const minLatitude = Math.max(
+                -85,
+                origin.latitude - latitudeDelta
+            );
+            const maxLatitude = Math.min(
+                85,
+                origin.latitude + latitudeDelta
+            );
+            const zoom = Math.max(
+                1,
+                Math.min(
+                    17,
+                    Math.round(15 - Math.log2(Math.max(radiusKm, 1) / 5))
+                )
+            );
+            const localLanguages = knownLanguages ||
+                await getWasteBankSearchLanguages(origin);
+            const commonSearchTerms = [
+                "waste bank",
+                "recycling center",
+                "recycling centre",
+                "recycling depot",
+                "recycling point",
+                "scrap yard",
+                "waste collection point"
+            ];
+            const localSearchTerms = localLanguages.flatMap(
+                language => WASTE_BANK_TERMS_BY_LANGUAGE[language] || []
+            );
+            const namedSearchTerms = Array.from(
+                new Set([
+                    ...commonSearchTerms,
+                    ...localSearchTerms
+                ])
+            );
+            const searches = [
+                {
+                    phrase: "recycling",
+                    tags: ["amenity:recycling"],
+                    requireNameMatch: false
+                },
+                {
+                    phrase: "recycling",
+                    tags: ["shop:recycling"],
+                    requireNameMatch: false
+                }
+            ].concat(
+                namedSearchTerms.map(
+                    phrase => ({
+                        phrase,
+                        tags: [],
+                        requireNameMatch: true
+                    })
+                )
+            );
+
+            const results = await Promise.allSettled(
+                searches.map(
+                    async function(search) {
+
+                        const parameters = new URLSearchParams({
+                            q: search.phrase,
+                            lat: origin.latitude.toFixed(6),
+                            lon: origin.longitude.toFixed(6),
+                            zoom: String(zoom),
+                            limit: "30",
+                            bbox: [
+                                minLongitude,
+                                minLatitude,
+                                maxLongitude,
+                                maxLatitude
+                            ].join(",")
+                        });
+
+                        search.tags.forEach(
+                            tag => parameters.append("osm_tag", tag)
+                        );
+
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(
+                            () => controller.abort(),
+                            12000
+                        );
+
+                        try {
+
+                            const response = await fetch(
+                                `https://photon.komoot.io/api/?${parameters}`,
+                                {
+                                    headers: {
+                                        Accept: "application/geo+json, application/json"
+                                    },
+                                    signal: controller.signal
+                                }
+                            );
+
+                            if (!response.ok) {
+                                throw new Error(
+                                    `Photon search failed (${response.status}).`
+                                );
+                            }
+
+                            const data = await response.json();
+                            const namePattern = new RegExp(
+                                namedSearchTerms
+                                    .map(
+                                        term => term.replace(
+                                            /[.*+?^${}()|[\]\\]/g,
+                                            "\\$&"
+                                        )
+                                    )
+                                    .join("|"),
+                                "i"
+                            );
+
+                            return (data.features || [])
+                                .filter(
+                                    feature => {
+
+                                        const properties =
+                                            feature.properties || {};
+                                        const isRecyclingTag =
+                                            properties.osm_key === "amenity" &&
+                                            properties.osm_value === "recycling" ||
+                                            properties.osm_key === "shop" &&
+                                            properties.osm_value === "recycling";
+                                        const matchesName =
+                                            namePattern.test(
+                                                String(properties.name || "")
+                                            );
+
+                                        return search.requireNameMatch
+                                            ? matchesName
+                                            : isRecyclingTag || matchesName;
+
+                                    }
+                                )
+                                .map(
+                                    feature => {
+
+                                        const properties =
+                                            feature.properties || {};
+                                        const coordinates =
+                                            feature.geometry?.coordinates || [];
+                                        const address = [
+                                            properties.housenumber,
+                                            properties.street,
+                                            properties.district,
+                                            properties.city,
+                                            properties.postcode,
+                                            properties.country
+                                        ].filter(Boolean).join(", ");
+                                        const osmType = {
+                                            N: "node",
+                                            W: "way",
+                                            R: "relation"
+                                        }[properties.osm_type] ||
+                                            properties.osm_type || "node";
+
+                                        return {
+                                            type: osmType,
+                                            id: properties.osm_id,
+                                            lat: Number(coordinates[1]),
+                                            lon: Number(coordinates[0]),
+                                            address,
+                                            tags: {
+                                                name: properties.name,
+                                                amenity:
+                                                    properties.osm_key === "amenity"
+                                                        ? properties.osm_value
+                                                        : undefined,
+                                                shop:
+                                                    properties.osm_key === "shop"
+                                                        ? properties.osm_value
+                                                        : undefined,
+                                                operator: properties.operator
+                                            },
+                                            matchedPhrase: search.phrase
+                                        };
+
+                                    }
+                                );
+
+                        } finally {
+
+                            clearTimeout(timeoutId);
+
+                        }
+
+                    }
+                )
+            );
+
+            const successfulResults = results.filter(
+                result => result.status === "fulfilled"
+            );
+            const features = successfulResults.flatMap(
+                result => result.value
+            );
+
+            if (successfulResults.length === 0) {
+                const firstError = results.find(
+                    result => result.status === "rejected"
+                );
+
+                throw firstError?.reason || new Error(
+                    "Place search is temporarily unavailable."
+                );
+            }
+
+            const uniqueFeatures = new Map();
+
+            for (const feature of features) {
+                const key = feature.id
+                    ? `${feature.type}/${feature.id}`
+                    : `${feature.lat}/${feature.lon}/${feature.tags.name}`;
+                const existing = uniqueFeatures.get(key);
+
+                if (existing) {
+                    existing.matchedPhrases.add(
+                        feature.matchedPhrase
+                    );
+                } else {
+                    uniqueFeatures.set(key, {
+                        ...feature,
+                        matchedPhrases: new Set([
+                            feature.matchedPhrase
+                        ])
+                    });
+                }
+            }
+
+            return {
+                elements: Array.from(uniqueFeatures.values())
+                    .map(feature => ({
+                        ...feature,
+                        matchCount: feature.matchedPhrases.size,
+                        matchedPhrases: Array.from(
+                            feature.matchedPhrases
+                        )
+                    }))
+            };
+
+        }
+
+
+        async function fetchNearbyWasteBanks(
+            origin,
+            radiusKm
+        ) {
+
+            const languages =
+                await getWasteBankSearchLanguages(origin);
+            const searchTerms = [
+                "waste bank",
+                "recycling center",
+                "recycling centre",
+                "recycling depot",
+                "scrap yard",
+                ...languages.flatMap(
+                    language => WASTE_BANK_TERMS_BY_LANGUAGE[language] || []
+                )
+            ];
+            const namePattern = Array.from(new Set(searchTerms))
+                .map(
+                    term => term
+                        .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+                        .replace(/\s+/g, "\\s+")
+                )
+                .join("|");
+            const radiusMeters = Math.round(radiusKm * 1000);
+            const around =
+                `around:${radiusMeters},${origin.latitude},${origin.longitude}`;
+            const requestTimeoutMs = Math.min(
+                18000,
+                12000 + Math.max(0, radiusKm - 20) * 10
+            );
+            const queryTimeoutSeconds = Math.max(
+                3,
+                Math.floor(requestTimeoutMs / 1000) - 1
+            );
+            const query =
+                `[out:json][timeout:${queryTimeoutSeconds}];(` +
+                `nwr(${around})["amenity"="recycling"];` +
+                `nwr(${around})["shop"="recycling"];` +
+                `nwr(${around})["recycling"];` +
+                `nwr(${around})["name"~"${namePattern}",i];` +
+                `);out center;`;
+
+            const providerResults = await Promise.allSettled([
+                fetchWasteBankData(
+                    query,
+                    false,
+                    requestTimeoutMs
+                ),
+                fetchPhotonWasteBanks(
+                    origin,
+                    radiusKm,
+                    languages
+                )
+            ]);
+            const overpassResult = providerResults[0];
+            const photonResult = providerResults[1];
+
+            if (overpassResult.status === "rejected") {
+                console.warn(
+                    "Overpass nearby search failed:",
+                    overpassResult.reason
+                );
+            }
+
+            if (photonResult.status === "rejected") {
+                console.warn(
+                    "Photon nearby search failed:",
+                    photonResult.reason
+                );
+            }
+
+            const mergedElements = new Map();
+
+            for (const result of providerResults) {
+
+                if (result.status !== "fulfilled") {
+                    continue;
+                }
+
+                for (const element of result.value.elements || []) {
+
+                    const latitude = Number(
+                        element.lat ?? element.center?.lat
+                    );
+                    const longitude = Number(
+                        element.lon ?? element.center?.lon
+                    );
+
+                    if (
+                        !Number.isFinite(latitude) ||
+                        !Number.isFinite(longitude) ||
+                        distanceInKm(
+                            origin,
+                            { latitude, longitude }
+                        ) > radiusKm
+                    ) {
+                        continue;
+                    }
+
+                    const key = element.id
+                        ? `${element.type}/${element.id}`
+                        : `${latitude}/${longitude}/${element.tags?.name || ""}`;
+
+                    if (!mergedElements.has(key)) {
+                        mergedElements.set(key, element);
+                    }
+
+                }
+
+            }
+
+            if (mergedElements.size === 0) {
+                throw new Error(
+                    "Neither map provider returned a mapped waste bank or recycling point in this radius."
+                );
+            }
+
+            return {
+                elements: Array.from(mergedElements.values()),
+                usedFallback: overpassResult.status === "rejected"
+            };
+
+        }
+
+
+        async function searchGooglePlaces(
+            origin,
+            radiusKm
+        ) {
+
+            const languages =
+                await getWasteBankSearchLanguages(origin);
+            const localTerms = languages.flatMap(
+                language => WASTE_BANK_TERMS_BY_LANGUAGE[language] || []
+            );
+            const commonTerms = [
+                "waste bank",
+                "recycling center",
+                "recycling centre",
+                "recycling depot",
+                "recycling facility",
+                "recycling drop off",
+                "waste collection center",
+                "scrap yard"
+            ];
+            const searchTerms = Array.from(new Set([
+                ...localTerms,
+                ...commonTerms
+            ])).slice(0, 4);
+            const latitudeDelta = radiusKm / 111;
+            const longitudeDelta = Math.min(
+                180,
+                radiusKm /
+                    (111 * Math.max(
+                        0.01,
+                        Math.cos(origin.latitude * Math.PI / 180)
+                    ))
+            );
+            const normalizeLongitude = longitude =>
+                ((longitude + 540) % 360) - 180;
+            const searchBounds = new LatLngBounds(
+                {
+                    lat: Math.max(-90, origin.latitude - latitudeDelta),
+                    lng: normalizeLongitude(
+                        origin.longitude - longitudeDelta
+                    )
+                },
+                {
+                    lat: Math.min(90, origin.latitude + latitudeDelta),
+                    lng: normalizeLongitude(
+                        origin.longitude + longitudeDelta
+                    )
+                }
+            );
+            const namePattern = new RegExp(
+                searchTerms
+                    .map(
+                        term => term
+                            .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+                            .replace(/\s+/g, "\\s+")
+                    )
+                    .join("|"),
+                "i"
+            );
+            const searchPlaces = async function(searchTerm) {
+
+                const response = await Place.searchByText({
+                    textQuery: searchTerm,
+                    fields: [
+                        "id",
+                        "displayName",
+                        "formattedAddress",
+                        "location",
+                        "primaryType",
+                        "primaryTypeDisplayName",
+                        "types",
+                        "googleMapsURI"
+                    ],
+                    locationBias: searchBounds,
+                    maxResultCount: 20,
+                    rankPreference: "DISTANCE",
+                    language: navigator.language || "en",
+                    region: languages.regionCode || undefined
+                });
+
+                return {
+                    searchTerm,
+                    places: response.places || []
+                };
+
+            };
+            const searches = [];
+
+            for (let index = 0; index < searchTerms.length; index += 4) {
+
+                const batch = await Promise.allSettled(
+                    searchTerms
+                        .slice(index, index + 4)
+                        .map(searchPlaces)
+                );
+
+                searches.push(...batch);
+
+            }
+
+            const successfulSearches = searches.filter(
+                result => result.status === "fulfilled"
+            );
+
+            if (successfulSearches.length === 0) {
+                const firstError = searches.find(
+                    result => result.status === "rejected"
+                );
+
+                throw firstError?.reason || new Error(
+                    "Google Places search is temporarily unavailable."
+                );
+            }
+
+            const placesById = new Map();
+
+            for (const result of successfulSearches) {
+
+                for (const place of result.value.places) {
+
+                    const latitude = typeof place.location?.lat === "function"
+                        ? place.location.lat()
+                        : Number(place.location?.lat);
+                    const longitude = typeof place.location?.lng === "function"
+                        ? place.location.lng()
+                        : Number(place.location?.lng);
+
+                    if (
+                        !Number.isFinite(latitude) ||
+                        !Number.isFinite(longitude) ||
+                        distanceInKm(
+                            origin,
+                            { latitude, longitude }
+                        ) > radiusKm
+                    ) {
+                        continue;
+                    }
+
+                    const placeId = String(
+                        place.id || `${latitude}/${longitude}`
+                    );
+                    const existing = placesById.get(placeId);
+
+                    if (existing) {
+                        existing.matchedPhrases.add(
+                            result.value.searchTerm
+                        );
+                        continue;
+                    }
+
+                    const name =
+                        typeof place.displayName === "string"
+                            ? place.displayName
+                            : place.displayName?.text || "Waste bank or recycling center";
+                    const placeType =
+                        typeof place.primaryTypeDisplayName === "string"
+                            ? place.primaryTypeDisplayName
+                            : place.primaryTypeDisplayName?.text ||
+                                place.primaryType ||
+                                place.types?.[0] ||
+                                "waste bank";
+
+                    placesById.set(placeId, {
+                        type: "google",
+                        id: placeId,
+                        lat: latitude,
+                        lon: longitude,
+                        address: place.formattedAddress || "",
+                        tags: {
+                            name,
+                            amenity: placeType,
+                            googleMapsURI: place.googleMapsURI
+                        },
+                        matchedPhrases: new Set([
+                            result.value.searchTerm
+                        ])
+                    });
+
+                }
+
+            }
+
+            return {
+                elements: Array.from(placesById.values())
+                    .map(
+                        place => ({
+                            ...place,
+                            matchCount: place.matchedPhrases.size,
+                            matchedPhrases: Array.from(
+                                place.matchedPhrases
+                            )
+                        })
+                    )
+            };
+
+        }
+
+
+        function lookupWasteBankAddress(
+            latitude,
+            longitude
+        ) {
+
+            const cacheKey =
+                `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
+
+            if (reverseGeocodeCache.has(cacheKey)) {
+                return Promise.resolve(
+                    reverseGeocodeCache.get(cacheKey)
+                );
+            }
+
+            const lookup = async function() {
+
+                const delay = Math.max(
+                    0,
+                    1100 - (Date.now() - lastReverseGeocodeAt)
+                );
+
+                if (delay > 0) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+
+                lastReverseGeocodeAt = Date.now();
+
+                const query = new URLSearchParams({
+                    format: "jsonv2",
+                    lat: latitude.toFixed(6),
+                    lon: longitude.toFixed(6),
+                    zoom: "18",
+                    addressdetails: "1"
+                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(
+                    () => controller.abort(),
+                    10000
+                );
+
+                try {
+
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?${query}`,
+                        {
+                            headers: {
+                                Accept: "application/json"
+                            },
+                            signal: controller.signal
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `Address lookup failed (${response.status}).`
+                        );
+                    }
+
+                    const result = await response.json();
+                    const address = result.display_name || "";
+
+                    reverseGeocodeCache.set(
+                        cacheKey,
+                        address
+                    );
+
+                    return address;
+
+                } finally {
+
+                    clearTimeout(timeoutId);
+
+                }
+
+            };
+
+            const pending = reverseGeocodeQueue.then(
+                lookup,
+                lookup
+            );
+
+            reverseGeocodeQueue = pending.catch(
+                () => ""
+            );
+
+            return pending;
+
+        }
+
+
+        function createWasteBankMarker(
+            element,
+            origin
+        ) {
+
+            const latitude = Number(
+                element.lat ??
+                element.center?.lat ??
+                element.geometry?.coordinates?.[1]
+            );
+            const longitude = Number(
+                element.lon ??
+                element.center?.lon ??
+                element.geometry?.coordinates?.[0]
+            );
+
+            if (
+                !Number.isFinite(latitude) ||
+                !Number.isFinite(longitude)
+            ) {
+                return false;
+            }
+
+            const tags = element.tags || {};
+            const distance = distanceInKm(
+                origin,
+                { latitude, longitude }
+            );
+            const name =
+                tags.name ||
+                tags.operator ||
+                "Recycling drop-off point";
+            const type =
+                tags.amenity ||
+                tags.shop ||
+                "waste bank";
+            const matchSummary = element.matchCount > 1
+                ? `<div class="popup-row"><strong>Cross-check:</strong> matched ${element.matchCount} search phrases</div>`
+                : "";
+            const address = tags["addr:full"] || [
+                tags["addr:housenumber"],
+                tags["addr:street"],
+                tags["addr:suburb"],
+                tags["addr:city"] ||
+                    tags["addr:town"] ||
+                    tags["addr:village"],
+                tags["addr:postcode"],
+                tags["addr:country"]
+            ].filter(Boolean).join(", ") || element.address || "";
+            const addressElementId =
+                `waste-bank-address-${++reverseGeocodeId}`;
+            const marker = L.marker(
+                [latitude, longitude],
+                { icon: wasteBankIcon }
+            );
+            const googleMapsUrl =
+                tags.googleMapsURI ||
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&query_place_id=${encodeURIComponent(element.id)}`;
+
+            marker.bindPopup(`
+                <div>
+                    <div class="popup-badge collection">WASTE BANK / RECYCLING</div>
+                    <div class="popup-title">${escapeHTML(name)}</div>
+                    <div class="popup-row"><strong>Type:</strong> ${escapeHTML(formatTitle(type))}</div>
+                    <div class="popup-row" id="${addressElementId}"><strong>Address:</strong> ${escapeHTML(address || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`)}</div>
+                    <div class="popup-row"><strong>Distance:</strong> ${distance.toFixed(1)} km</div>
+                    ${matchSummary}
+                    <div class="popup-row"><a href="${escapeHTML(googleMapsUrl)}" target="_blank" rel="noopener noreferrer">Google Maps details</a></div>
+                </div>
+            `);
+
+            if (!address && element.type !== "google") {
+
+                marker.on(
+                    "popupopen",
+                    function() {
+
+                        const addressElement =
+                            document.getElementById(addressElementId);
+
+                        if (
+                            !addressElement ||
+                            addressElement.dataset.lookupStarted
+                        ) {
+                            return;
+                        }
+
+                        addressElement.dataset.lookupStarted = "true";
+
+                        lookupWasteBankAddress(
+                            latitude,
+                            longitude
+                        ).then(
+                            function(resolvedAddress) {
+
+                                const element =
+                                    document.getElementById(addressElementId);
+
+                                if (element) {
+                                    element.textContent =
+                                        `Address: ${resolvedAddress || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`}`;
+                                }
+
+                            }
+                        ).catch(
+                            function() {
+
+                                const element =
+                                    document.getElementById(addressElementId);
+
+                                if (element) {
+                                    element.textContent =
+                                        `Address unavailable; coordinates: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+                                }
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+
+            marker.addTo(wasteBankLayer);
+            return true;
+
+        }
+
+
+        async function findNearbyWasteBanks(selectedCenter = null) {
+
+            const button =
+                document.getElementById("findWasteBanksButton");
+            const status =
+                document.getElementById("wasteBankStatus");
+            const selectedRadius =
+                document.getElementById("wasteBankRadius").value;
+            const radiusKm = Number(selectedRadius);
+
+            button.disabled = true;
+            button.textContent = "Searching...";
+            wasteBankLayer.clearLayers();
+            document.getElementById("wasteBankCount").textContent = "0";
+            status.textContent = selectedCenter
+                ? `Searching Google Maps within ${radiusKm} km of the selected map point...`
+                : "Getting your location and searching Google Maps...";
+
+            const stillSearchingTimer =
+                setTimeout(
+                    function() {
+
+                        if (button.disabled) {
+                            status.textContent =
+                                "Still searching Google Maps...";
+                        }
+
+                    },
+                    8000
+                );
+
+            try {
+
+                let preciseLocation;
+
+                if (selectedCenter) {
+
+                    preciseLocation = {
+                        latitude: Number(selectedCenter.latitude),
+                        longitude: Number(selectedCenter.longitude),
+                        accuracy: null
+                    };
+
+                    if (
+                        !Number.isFinite(preciseLocation.latitude) ||
+                        !Number.isFinite(preciseLocation.longitude)
+                    ) {
+                        throw new Error(
+                            "The selected map point is not a valid location."
+                        );
+                    }
+
+                    showSearchCenter(
+                        preciseLocation,
+                        radiusKm
+                    );
+
+                } else {
+
+                    if (!currentUserLocation) {
+                        currentUserLocation =
+                            await getCurrentCoordinates();
+                    }
+
+                    preciseLocation = currentUserLocation;
+
+                    showUserMarker(
+                        preciseLocation.latitude,
+                        preciseLocation.longitude,
+                        false,
+                        preciseLocation.accuracy,
+                        radiusKm
+                    );
+
+                }
+
+                const searchOrigin = {
+                    latitude: preciseLocation.latitude,
+                    longitude: preciseLocation.longitude
+                };
+
+                const data = await searchGooglePlaces(
+                    searchOrigin,
+                    radiusKm
+                );
+
+                const uniqueElements = new Map();
+
+                for (const element of data.elements || []) {
+                    uniqueElements.set(
+                        `${element.type}/${element.id}`,
+                        element
+                    );
+                }
+
+                wasteBankLayer.clearLayers();
+                let markerCount = 0;
+                const maxDistance = radiusKm;
+
+                for (const element of uniqueElements.values()) {
+                    const latitude = Number(
+                        element.lat ?? element.center?.lat
+                    );
+                    const longitude = Number(
+                        element.lon ?? element.center?.lon
+                    );
+
+                    if (
+                        !Number.isFinite(latitude) ||
+                        !Number.isFinite(longitude) ||
+                        distanceInKm(
+                            searchOrigin,
+                            { latitude, longitude }
+                        ) > maxDistance
+                    ) {
+                        continue;
+                    }
+
+                    if (
+                        createWasteBankMarker(
+                            element,
+                            searchOrigin
+                        )
+                    ) {
+                        markerCount += 1;
+                    }
+                }
+
+                const zoom = Math.max(
+                    5,
+                    Math.min(
+                        14,
+                        Math.round(14 - Math.log2(radiusKm / 5))
+                    )
+                );
+
+                document.getElementById(
+                    "wasteBankCount"
+                ).textContent = markerCount;
+
+                map.setView(
+                    [
+                        preciseLocation.latitude,
+                        preciseLocation.longitude
+                    ],
+                    zoom
+                );
+
+                status.textContent = markerCount
+                    ? `${markerCount} Google Maps place(s) found within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`
+                    : `Google Maps returned no matching places within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`;
+
+            } catch (error) {
+
+                console.error(
+                    "Waste-bank search failed:",
+                    error
+                );
+
+                status.textContent = error.name === "AbortError"
+                    ? "Google Maps search timed out. Please try again."
+                    : error.message || "Could not search Google Maps right now.";
+
+            } finally {
+
+                clearTimeout(stillSearchingTimer);
+                button.disabled = false;
+                button.textContent = "Search Google Maps";
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           LOAD COMMUNITY IMPACT
+           ===================================================== */
+
+        async function loadImpactActions() {
+
+            const response =
+                await fetch(
+                    `${SUPABASE_URL}/rest/v1/impact_actions?select=*`,
+                    {
+                        headers: {
+
+                            apikey:
+                                SUPABASE_KEY,
+
+                            Authorization:
+                                `Bearer ${SUPABASE_KEY}`
+
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const errorText =
+                    await response.text();
+
+
+                console.error(
+                    "Impact actions error:",
+                    response.status,
+                    errorText
+                );
+
+
+                throw new Error(
+                    `Impact actions request failed: ${response.status}`
+                );
+
+            }
+
+
+            return await response.json();
+
+        }
+
+
+
+        /* =====================================================
+           LOAD ALL MAP DATA
+           ===================================================== */
+
+        async function loadMapData() {
+
+            const status =
+                document.getElementById(
+                    "mapStatus"
+                );
+
+
+            status.textContent =
+                "Syncing EcoScan community data...";
+
+
+            impactLayer.clearLayers();
+
+
+            try {
+
+                /*
+                 * Load community impact actions.
+                 */
+
+                let impacts = [];
+
+
+                try {
+
+                    impacts =
+                        await loadImpactActions();
+
+
+                    console.log(
+                        "Community impacts:",
+                        impacts
+                    );
+
+                }
+
+
+                catch (impactError) {
+
+                    /* The live nearby search remains available if community data fails. */
+
+                    console.error(
+                        "Could not load impact actions:",
+                        impactError
+                    );
+
+
+                    impacts = [];
+
+                }
+
+
+                impacts.forEach(
+                    createImpactMarker
+                );
+
+
+
+                /* =================================================
+                   COMMUNITY CONTRIBUTIONS
+                   ================================================= */
+
+                const contributionCount =
+                    impacts.length;
+
+
+                document.getElementById(
+                    "communityContributions"
+                ).textContent =
+                    contributionCount;
+
+
+
+                /* =================================================
+                   RECYCLED AMOUNT
+                   ================================================= */
+
+                const recycledAmount =
+                    impacts.reduce(
+
+                        (
+                            total,
+                            impact
+                        ) => {
+
+                            return (
+                                total +
+                                getImpactValue(
+                                    impact
+                                )
+                            );
+
+                        },
+
+                        0
+
+                    );
+
+
+                document.getElementById(
+                    "recycledAmount"
+                ).textContent =
+                    `${recycledAmount.toFixed(1)} kg`;
+
+
+
+                /* =================================================
+                   STATUS
+                   ================================================= */
+
+                status.textContent =
+                    `${impacts.length} community impact(s) connected.`;
+
+
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Map loading error:",
+                    error
+                );
+
+
+                status.textContent =
+                    "Unable to connect to EcoScan database.";
+
+            }
+
+        }
+
+
+
+        /* =====================================================
+           MY LOCATION
+           ===================================================== */
+
+        function showUserMarker(
+            latitude,
+            longitude,
+            zoomToLocation,
+            accuracyMeters,
+            searchRadiusKm
+        ) {
+
+            currentUserLocation = {
+                latitude,
+                longitude,
+                accuracy: accuracyMeters
+            };
+
+            if (searchCenterMarker) {
+                map.removeLayer(searchCenterMarker);
+                searchCenterMarker = null;
+            }
+
+            if (searchRadiusCircle) {
+                map.removeLayer(searchRadiusCircle);
+                searchRadiusCircle = null;
+            }
+
+            if (userSearchRadiusCircle) {
+                map.removeLayer(userSearchRadiusCircle);
+                userSearchRadiusCircle = null;
+            }
+
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+
+            if (userAccuracyCircle) {
+                map.removeLayer(userAccuracyCircle);
+            }
+
+            if (
+                Number.isFinite(accuracyMeters) &&
+                accuracyMeters > 0
+            ) {
+                userAccuracyCircle = L.circle(
+                    [latitude, longitude],
+                    {
+                        radius: accuracyMeters,
+                        color: "#167447",
+                        weight: 1,
+                        fillColor: "#2fc978",
+                        fillOpacity: 0.16
+                    }
+                ).addTo(map);
+            }
+
+            if (
+                Number.isFinite(searchRadiusKm) &&
+                searchRadiusKm > 0
+            ) {
+                userSearchRadiusCircle = L.circle(
+                    [latitude, longitude],
+                    {
+                        radius: searchRadiusKm * 1000,
+                        color: "#3587a4",
+                        weight: 2,
+                        fillColor: "#5db7d2",
+                        fillOpacity: 0.08
+                    }
+                ).addTo(map);
+            }
+
+            userMarker = L.marker(
+                [latitude, longitude],
+                { icon: userIcon }
+            ).addTo(map);
+
+            const marker = userMarker;
+            const accuracyText = Number.isFinite(accuracyMeters)
+                ? `About ${Math.round(accuracyMeters)} m (device estimate)`
+                : "Unavailable";
+            const locationPopup = address => `
+                <div>
+                    <div class="popup-title">Your Location</div>
+                    <div class="popup-row"><strong>Address:</strong> ${escapeHTML(address || "Looking up address...")}</div>
+                    <div class="popup-row"><strong>Coordinates:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}</div>
+                    <div class="popup-row"><strong>Accuracy:</strong> ${accuracyText}</div>
+                    <div class="popup-row">This marker is temporary and is not added to the EcoScan community map.</div>
+                </div>
+            `;
+
+            marker.bindPopup(locationPopup("Looking up address..."));
+
+            lookupWasteBankAddress(
+                latitude,
+                longitude
+            ).then(
+                function(address) {
+                    if (userMarker === marker) {
+                        marker.setPopupContent(
+                            locationPopup(address || "Address unavailable")
+                        );
+                    }
+                }
+            ).catch(
+                function() {
+                    if (userMarker === marker) {
+                        marker.setPopupContent(
+                            locationPopup("Address unavailable")
+                        );
+                    }
+                }
+            );
+
+            if (zoomToLocation) {
+                const locationZoom = Number.isFinite(searchRadiusKm)
+                    ? Math.max(
+                        5,
+                        Math.min(
+                            15,
+                            Math.round(12 - Math.log2(searchRadiusKm / 10))
+                        )
+                    )
+                    : 15;
+
+                map.setView(
+                    [latitude, longitude],
+                    locationZoom
+                );
+                userMarker.openPopup();
+            }
+
+        }
+
+
+        function showSearchCenter(
+            center,
+            radiusKm
+        ) {
+
+            if (searchCenterMarker) {
+                map.removeLayer(searchCenterMarker);
+            }
+
+            if (searchRadiusCircle) {
+                map.removeLayer(searchRadiusCircle);
+            }
+
+            searchRadiusCircle = L.circle(
+                [center.latitude, center.longitude],
+                {
+                    radius: radiusKm * 1000,
+                    color: "#167447",
+                    weight: 2,
+                    fillColor: "#2fc978",
+                    fillOpacity: 0.08
+                }
+            ).addTo(map);
+
+            searchCenterMarker = L.marker(
+                [center.latitude, center.longitude],
+                { icon: userIcon }
+            ).addTo(map);
+
+            searchCenterMarker.bindPopup(`
+                <div>
+                    <div class="popup-title">Search Center</div>
+                    <div class="popup-row">Waste banks are being searched within ${radiusKm} km of this point.</div>
+                </div>
+            `);
+            searchCenterMarker.openPopup();
+
+        }
+
+        async function findMyLocation() {
+            const button =
+                document.querySelector(
+                    ".location-button"
+                );
+
+
+            const originalText =
+                button.innerHTML;
+
+
+            const searchRadiusKm = Number(
+                document.getElementById("wasteBankRadius").value
+            );
+
+            button.innerHTML =
+                `
+                    <span>⌛</span>
+                    Locating...
+                `;
+
+
+            button.disabled = true;
+            button.innerHTML = "<span>⌛</span> Requesting location...";
+
+            try {
+
+                const position =
+                    await getCurrentCoordinates();
+
+                showUserMarker(
+                    position.latitude,
+                    position.longitude,
+                    true,
+                    position.accuracy,
+                    searchRadiusKm
+                );
+
+                document.getElementById("wasteBankStatus")
+                    .textContent =
+                    `Location found. Right-click the map to search another area; current radius is ${searchRadiusKm} km.`;
+
+            } catch (error) {
+
+                console.error(
+                    "Geolocation error:",
+                    error
+                );
+
+                document.getElementById("wasteBankStatus")
+                    .textContent =
+                    error.code === 1
+                        ? "Location permission was denied. Allow it in your browser's site settings, then try again."
+                        : error.message ||
+                            "Unable to get your location. Check device location services and try again.";
+
+            } finally {
+
+                button.disabled = false;
+                button.innerHTML = originalText;
+
+            }
+
+        }
+
+
+        async function autoDetectUserLocation() {
+
+            const status =
+                document.getElementById("wasteBankStatus");
+            const searchRadiusKm = Number(
+                document.getElementById("wasteBankRadius").value
+            );
+
+            try {
+
+                const position =
+                    await getCurrentCoordinates();
+
+                showUserMarker(
+                    position.latitude,
+                    position.longitude,
+                    true,
+                    position.accuracy,
+                    searchRadiusKm
+                );
+
+                status.textContent =
+                    `Location found. Right-click the map to search another area within ${searchRadiusKm} km.`;
+
+            } catch (error) {
+
+                console.info(
+                    "Automatic location detection was unavailable:",
+                    error
+                );
+                status.textContent =
+                    "Allow location access to find nearby waste banks, or right-click a map area to search there.";
+
+            }
+
+        }
+
+
+        function initializeMap() {
+
+            document
+                .getElementById("findMyLocationButton")
+                .addEventListener(
+                    "click",
+                    findMyLocation
+                );
+
+            document
+                .getElementById("findWasteBanksButton")
+                .addEventListener(
+                    "click",
+                    function() {
+                        findNearbyWasteBanks();
+                    }
+                );
+
+            let lastMapContextSearch = null;
+            const searchAtMapPoint = function(event) {
+
+                if (
+                    document.getElementById("findWasteBanksButton")
+                        .disabled
+                ) {
+                    return;
+                }
+
+                const selectedCenter = {
+                    latitude: event.latlng.lat,
+                    longitude: event.latlng.lng
+                };
+                const now = Date.now();
+
+                if (
+                    lastMapContextSearch &&
+                    now - lastMapContextSearch.time < 500 &&
+                    Math.abs(
+                        lastMapContextSearch.latitude -
+                            selectedCenter.latitude
+                    ) < 0.00001 &&
+                    Math.abs(
+                        lastMapContextSearch.longitude -
+                            selectedCenter.longitude
+                    ) < 0.00001
+                ) {
+                    return;
+                }
+
+                lastMapContextSearch = {
+                    ...selectedCenter,
+                    time: now
+                };
+
+                findNearbyWasteBanks(selectedCenter);
+
+            };
+
+            map.on("contextmenu", searchAtMapPoint);
+            map.on("rightclick", searchAtMapPoint);
+
+            loadMapData();
+
+            document.getElementById("wasteBankStatus")
+                .textContent =
+                "Tap My Location, search near you, or right-click the map to search that point using the selected radius.";
+
+            autoDetectUserLocation();
+
+        }
+
+
+
+        /* =====================================================
+           INITIALIZE
+           ===================================================== */
+
+        initializeMap();
+
+
+
+        /* =====================================================
+           AUTO REFRESH
+           ===================================================== */
+
+        /*
+         * Refresh community data every 30 seconds.
+         *
+         * This means if another user adds an impact action,
+         * the map can update without manually refreshing
+         * the entire page.
+         */
+
+        setInterval(
+            loadMapData,
+            30000
+        );
+
+        })();
+
+    </script>
+
+
+</body>
+
+</html>
