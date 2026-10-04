@@ -513,6 +513,11 @@
         }
 
 
+        .map-card.is-choosing-area #map {
+            cursor: crosshair;
+        }
+
+
         .map-card.is-expanded {
             position: fixed;
             inset: 0;
@@ -994,7 +999,33 @@
         }
 
 
+        .nearby-select-button {
+            min-height: 40px;
+            border: 1px solid rgba(101,201,142,0.3);
+            border-radius: 8px;
+            padding: 0 14px;
+            background: rgba(101,201,142,0.1);
+            color: #a9e6bf;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+
+        .nearby-select-button[aria-pressed="true"] {
+            border-color: #65c98e;
+            background: #65c98e;
+            color: #102119;
+        }
+
+
         .nearby-search-button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+
+        .nearby-select-button:disabled {
             cursor: wait;
             opacity: 0.65;
         }
@@ -1705,12 +1736,21 @@
                         Search Google Maps
                     </button>
 
+                    <button
+                        type="button"
+                        class="nearby-select-button"
+                        id="chooseMapAreaButton"
+                        aria-pressed="false"
+                    >
+                        Choose area on map
+                    </button>
+
                     <div
                         class="nearby-status"
                         id="wasteBankStatus"
                         aria-live="polite"
                     >
-                        Search Google Maps for nearby waste banks and recycling centers.
+                        Search nearby banks, or choose a point on the map.
                     </div>
 
                 </div>
@@ -4301,9 +4341,44 @@
                 .addEventListener(
                     "click",
                     function() {
+                        setMapAreaSelection(false);
                         findNearbyWasteBanks();
                     }
                 );
+
+            const chooseMapAreaButton =
+                document.getElementById("chooseMapAreaButton");
+            const wasteBankStatus =
+                document.getElementById("wasteBankStatus");
+            let choosingMapArea = false;
+
+            const setMapAreaSelection = function(active) {
+                choosingMapArea = active;
+                mapCard.classList.toggle("is-choosing-area", active);
+                chooseMapAreaButton.setAttribute(
+                    "aria-pressed",
+                    String(active)
+                );
+                chooseMapAreaButton.textContent =
+                    active ? "Cancel area selection" : "Choose area on map";
+                wasteBankStatus.textContent = active
+                    ? "Tap the map where you want to search. Drag to move the map; your search starts only when you tap a point."
+                    : "Search Google Maps for nearby waste banks and recycling centers.";
+            };
+
+            chooseMapAreaButton.addEventListener(
+                "click",
+                function() {
+                    if (
+                        document.getElementById("findWasteBanksButton")
+                            .disabled
+                    ) {
+                        return;
+                    }
+
+                    setMapAreaSelection(!choosingMapArea);
+                }
+            );
 
             let lastMapContextSearch = null;
             const searchAtMapPoint = function(event) {
@@ -4345,6 +4420,18 @@
 
             };
 
+            map.on(
+                "click",
+                function(event) {
+                    if (!choosingMapArea) {
+                        return;
+                    }
+
+                    setMapAreaSelection(false);
+                    searchAtMapPoint(event);
+                }
+            );
+
             map.on("contextmenu", searchAtMapPoint);
             map.on("rightclick", searchAtMapPoint);
 
@@ -4352,7 +4439,7 @@
 
             document.getElementById("wasteBankStatus")
                 .textContent =
-                "Tap My Location, search near you, or right-click the map to search that point using the selected radius.";
+                "Search near you, choose an area on the map, or right-click a map point on desktop.";
 
             autoDetectUserLocation();
 
