@@ -701,11 +701,34 @@
         }
 
 
+        @media (max-width: 650px) {
+
+            .gm-style .gm-style-iw-c {
+                max-width: calc(100vw - 36px) !important;
+            }
+
+
+            .gm-style .gm-style-iw-d {
+                box-sizing: border-box;
+                max-width: calc(100vw - 68px) !important;
+                max-height: min(55vh, 340px) !important;
+                margin: 14px 16px !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+                touch-action: pan-y;
+            }
+
+        }
+
+
         .popup-title {
             font-size: 16px;
             font-weight: 800;
             color: #1f2d24;
             margin-bottom: 8px;
+            overflow-wrap: anywhere;
         }
 
 
@@ -748,6 +771,50 @@
 
         .popup-row strong {
             color: #29362e;
+        }
+
+
+        .popup-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+
+        .popup-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 9px 12px;
+            border-radius: 9px;
+            background: #e8f5ed;
+            color: #17663d;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.2;
+            text-decoration: none;
+            transition:
+                background-color 160ms ease,
+                transform 160ms ease;
+        }
+
+
+        .popup-action.primary {
+            background: #18794e;
+            color: #ffffff;
+        }
+
+
+        .popup-action:hover {
+            background: #d7eddf;
+            transform: translateY(-1px);
+        }
+
+
+        .popup-action.primary:hover {
+            background: #12643f;
         }
 
 
@@ -1151,6 +1218,19 @@
 
             .map-live {
                 display: none;
+            }
+
+
+            .popup-actions {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+
+            .popup-action {
+                min-height: 44px;
+                padding: 10px;
+                text-align: center;
             }
 
         }
@@ -3263,9 +3343,13 @@
                 [latitude, longitude],
                 { icon: wasteBankIcon }
             );
+            const locationQuery =
+                `${name} ${latitude},${longitude}`;
             const googleMapsUrl =
                 tags.googleMapsURI ||
-                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&query_place_id=${encodeURIComponent(element.id)}`;
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationQuery)}`;
+            const directionsUrl =
+                `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${latitude},${longitude}`)}`;
 
             marker.bindPopup(`
                 <div>
@@ -3275,7 +3359,10 @@
                     <div class="popup-row" id="${addressElementId}"><strong>Address:</strong> ${escapeHTML(address || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`)}</div>
                     <div class="popup-row"><strong>Distance:</strong> ${distance.toFixed(1)} km</div>
                     ${matchSummary}
-                    <div class="popup-row"><a href="${escapeHTML(googleMapsUrl)}" target="_blank" rel="noopener noreferrer">Google Maps details</a></div>
+                    <div class="popup-actions">
+                        <a class="popup-action primary" href="${escapeHTML(directionsUrl)}" target="_blank" rel="noopener noreferrer">Get directions</a>
+                        <a class="popup-action" href="${escapeHTML(googleMapsUrl)}" target="_blank" rel="noopener noreferrer">Place details</a>
+                    </div>
                 </div>
             `);
 

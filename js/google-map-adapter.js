@@ -281,21 +281,6 @@
                         this.popup.addListener(
                             "domready",
                             () => {
-                                const popupContainer =
-                                    document.querySelector(".gm-style-iw-c");
-
-                                if (popupContainer) {
-                                    popupContainer.addEventListener(
-                                        "pointerleave",
-                                        () => {
-                                            if (activeInfoWindow === this.popup) {
-                                                closeActiveInfoWindow();
-                                            }
-                                        },
-                                        { once: true }
-                                    );
-                                }
-
                                 this.popupOpenHandlers.forEach(
                                     handler => handler()
                                 );
