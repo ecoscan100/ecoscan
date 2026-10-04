@@ -513,6 +513,51 @@
         }
 
 
+        .map-card.is-expanded {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding:
+                max(12px, env(safe-area-inset-top))
+                max(12px, env(safe-area-inset-right))
+                max(12px, env(safe-area-inset-bottom))
+                max(12px, env(safe-area-inset-left));
+            border: 0;
+            border-radius: 0;
+            background: #101b15;
+        }
+
+
+        .map-card.is-expanded .map-viewport {
+            display: flex;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+
+
+        .map-card.is-expanded #map {
+            flex: 1 1 auto;
+            height: 100% !important;
+            min-height: 0;
+        }
+
+
+        .map-card.is-expanded .map-status,
+        .map-card.is-expanded .nearby-status {
+            display: none;
+        }
+
+
+        body.map-view-expanded {
+            overflow: hidden;
+        }
+
+
         /* =====================================================
            MAP LEGEND
            ===================================================== */
@@ -824,10 +869,46 @@
 
         .map-controls {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            gap: 10px;
 
             padding:
                 13px 5px 3px;
+        }
+
+
+        .map-view-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+            padding: 10px 15px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 11px;
+            background: rgba(255,255,255,0.07);
+            color: #e8f3eb;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            transition:
+                background-color 160ms ease,
+                border-color 160ms ease,
+                transform 160ms ease;
+        }
+
+
+        .map-view-button:hover {
+            transform: translateY(-1px);
+            border-color: rgba(101,201,142,0.48);
+            background: rgba(101,201,142,0.14);
+        }
+
+
+        .map-view-button:focus-visible {
+            outline: 3px solid rgba(101,201,142,0.75);
+            outline-offset: 2px;
         }
 
 
@@ -1233,6 +1314,73 @@
                 text-align: center;
             }
 
+
+            .map-card.is-expanded {
+                gap: 6px;
+                padding:
+                    max(8px, env(safe-area-inset-top))
+                    max(8px, env(safe-area-inset-right))
+                    max(8px, env(safe-area-inset-bottom))
+                    max(8px, env(safe-area-inset-left));
+            }
+
+
+            .map-card.is-expanded .map-topbar {
+                min-height: 48px;
+                padding: 0 4px 4px;
+            }
+
+
+            .map-card.is-expanded .map-viewport .map-legend {
+                position: absolute;
+                top: auto;
+                right: 10px;
+                bottom: 10px;
+                left: auto;
+                width: auto;
+                margin: 0;
+                padding: 8px 10px;
+            }
+
+
+            .map-card.is-expanded .legend-title {
+                margin-bottom: 4px;
+            }
+
+
+            .map-card.is-expanded .legend-row {
+                gap: 6px;
+                margin-top: 4px;
+                font-size: 9px;
+            }
+
+
+            .map-card.is-expanded .legend-icon {
+                width: 20px;
+                height: 20px;
+                font-size: 11px;
+            }
+
+
+            .map-card.is-expanded .nearby-toolbar {
+                flex: 0 0 auto;
+                gap: 7px;
+                padding: 4px 2px;
+            }
+
+
+            .map-card.is-expanded .nearby-toolbar label {
+                flex: 1 1 auto;
+                gap: 6px;
+                font-size: 11px;
+            }
+
+
+            .map-card.is-expanded .nearby-toolbar select,
+            .map-card.is-expanded .nearby-search-button {
+                min-height: 38px;
+            }
+
         }
 
 
@@ -1626,6 +1774,17 @@
 
                         My Location
 
+                    </button>
+
+                    <button
+                        class="map-view-button"
+                        id="toggleMapViewButton"
+                        type="button"
+                        aria-pressed="false"
+                        aria-label="Expand map view"
+                    >
+                        <span aria-hidden="true">⛶</span>
+                        <span id="mapViewButtonLabel">Expand map</span>
                     </button>
 
                 </div>
@@ -4075,6 +4234,67 @@
                     "click",
                     findMyLocation
                 );
+
+            const mapCard =
+                document.querySelector(".map-card");
+            const mapViewButton =
+                document.getElementById("toggleMapViewButton");
+            const mapViewButtonLabel =
+                document.getElementById("mapViewButtonLabel");
+
+            const setExpandedMapView = function(expanded) {
+                mapCard.classList.toggle("is-expanded", expanded);
+                document.body.classList.toggle(
+                    "map-view-expanded",
+                    expanded
+                );
+                mapViewButton.setAttribute(
+                    "aria-pressed",
+                    String(expanded)
+                );
+                mapViewButton.setAttribute(
+                    "aria-label",
+                    expanded ? "Close expanded map view" : "Expand map view"
+                );
+                mapViewButtonLabel.textContent =
+                    expanded ? "Close map" : "Expand map";
+                mapViewButton.firstElementChild.textContent =
+                    expanded ? "×" : "⛶";
+
+                map.setInteractionMode?.(expanded);
+                requestAnimationFrame(
+                    function() {
+                        map.invalidateSize?.();
+                        setTimeout(
+                            function() {
+                                map.invalidateSize?.();
+                            },
+                            180
+                        );
+                    }
+                );
+            };
+
+            mapViewButton.addEventListener(
+                "click",
+                function() {
+                    setExpandedMapView(
+                        !mapCard.classList.contains("is-expanded")
+                    );
+                }
+            );
+
+            document.addEventListener(
+                "keydown",
+                function(event) {
+                    if (
+                        event.key === "Escape" &&
+                        mapCard.classList.contains("is-expanded")
+                    ) {
+                        setExpandedMapView(false);
+                    }
+                }
+            );
 
             document
                 .getElementById("findWasteBanksButton")

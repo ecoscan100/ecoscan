@@ -131,6 +131,7 @@
                                 mapTypeControl: false,
                                 streetViewControl: false,
                                 fullscreenControl: false,
+                                gestureHandling: "cooperative",
                                 zoomControl: true
                             }
                         );
@@ -148,6 +149,24 @@
                         });
                         this.googleMap.setZoom(zoom);
                         return this;
+                    }
+
+                    setInteractionMode(expanded) {
+                        this.googleMap.setOptions({
+                            gestureHandling:
+                                expanded ? "greedy" : "cooperative"
+                        });
+                    }
+
+                    invalidateSize() {
+                        const center = this.googleMap.getCenter();
+                        google.maps.event.trigger(
+                            this.googleMap,
+                            "resize"
+                        );
+                        if (center) {
+                            this.googleMap.setCenter(center);
+                        }
                     }
 
                     on(eventName, handler) {
