@@ -368,7 +368,8 @@
                             strokeColor: options.color,
                             strokeWeight: options.weight,
                             fillColor: options.fillColor,
-                            fillOpacity: options.fillOpacity
+                            fillOpacity: options.fillOpacity,
+                            clickable: false
                         });
                     }
 

@@ -3220,7 +3220,7 @@
                 "scrap yard"
             ];
             const searchTerms = Array.from(new Set([
-                ...localTerms,
+                ...localTerms.slice(0, 1),
                 ...commonTerms
             ])).slice(0, 4);
             const latitudeDelta = radiusKm / 111;
@@ -3302,6 +3302,8 @@
             const successfulSearches = searches.filter(
                 result => result.status === "fulfilled"
             );
+            const failedSearchCount =
+                searches.length - successfulSearches.length;
 
             if (successfulSearches.length === 0) {
                 const firstError = searches.find(
@@ -3391,7 +3393,8 @@
                                 place.matchedPhrases
                             )
                         })
-                    )
+                    ),
+                failedSearchCount
             };
 
         }
@@ -3635,8 +3638,6 @@
 
             button.disabled = true;
             button.textContent = "Searching...";
-            wasteBankLayer.clearLayers();
-            document.getElementById("wasteBankCount").textContent = "0";
             status.textContent = selectedCenter
                 ? `Searching Google Maps within ${radiusKm} km of the selected map point...`
                 : "Getting your location and searching Google Maps...";
@@ -3704,25 +3705,52 @@
                     longitude: preciseLocation.longitude
                 };
 
-                const data = await searchGooglePlaces(
-                    searchOrigin,
-                    radiusKm
-                );
+                let googleData = null;
+                try {
+                    googleData = await searchGooglePlaces(
+                        searchOrigin,
+                        radiusKm
+                    );
+                } catch (googleError) {
+                    console.warn(
+                        "Google Maps search failed; trying OpenStreetMap data:",
+                        googleError
+                    );
+                }
+
+                let data = googleData;
+                let resultSource = "Google Maps";
+                const shouldUseFallback =
+                    !googleData ||
+                    googleData.elements.length === 0 ||
+                    googleData.failedSearchCount > 0;
+
+                if (shouldUseFallback) {
+                    try {
+                        data = await fetchNearbyWasteBanks(
+                            searchOrigin,
+                            radiusKm
+                        );
+                        resultSource = "OpenStreetMap";
+                    } catch (fallbackError) {
+                        console.warn(
+                            "OpenStreetMap fallback failed:",
+                            fallbackError
+                        );
+
+                        if (!googleData?.elements.length) {
+                            throw fallbackError;
+                        }
+
+                        data = googleData;
+                        resultSource =
+                            "Google Maps (some searches unavailable)";
+                    }
+                }
 
                 const uniqueElements = new Map();
 
                 for (const element of data.elements || []) {
-                    uniqueElements.set(
-                        `${element.type}/${element.id}`,
-                        element
-                    );
-                }
-
-                wasteBankLayer.clearLayers();
-                let markerCount = 0;
-                const maxDistance = radiusKm;
-
-                for (const element of uniqueElements.values()) {
                     const latitude = Number(
                         element.lat ?? element.center?.lat
                     );
@@ -3736,7 +3764,78 @@
                         distanceInKm(
                             searchOrigin,
                             { latitude, longitude }
-                        ) > maxDistance
+                        ) > radiusKm
+                    ) {
+                        continue;
+                    }
+
+                    const key = element.id
+                        ? `${element.type}/${element.id}`
+                        : `${latitude}/${longitude}/${element.tags?.name || ""}`;
+
+                    if (!uniqueElements.has(key)) {
+                        uniqueElements.set(key, element);
+                    }
+                }
+
+                const sortedElements = Array.from(
+                    uniqueElements.values()
+                ).sort(
+                    (first, second) => {
+                        const firstCoordinates = {
+                            latitude: Number(
+                                first.lat ?? first.center?.lat
+                            ),
+                            longitude: Number(
+                                first.lon ?? first.center?.lon
+                            )
+                        };
+                        const secondCoordinates = {
+                            latitude: Number(
+                                second.lat ?? second.center?.lat
+                            ),
+                            longitude: Number(
+                                second.lon ?? second.center?.lon
+                            )
+                        };
+                        const distanceDifference =
+                            distanceInKm(searchOrigin, firstCoordinates) -
+                            distanceInKm(searchOrigin, secondCoordinates);
+
+                        if (Math.abs(distanceDifference) > 0.001) {
+                            return distanceDifference;
+                        }
+
+                        return String(
+                            first.tags?.name || first.tags?.operator || ""
+                        ).localeCompare(
+                            String(
+                                second.tags?.name ||
+                                second.tags?.operator ||
+                                ""
+                            )
+                        );
+                    }
+                );
+
+                wasteBankLayer.clearLayers();
+                let markerCount = 0;
+
+                for (const element of sortedElements) {
+                    const latitude = Number(
+                        element.lat ?? element.center?.lat
+                    );
+                    const longitude = Number(
+                        element.lon ?? element.center?.lon
+                    );
+
+                    if (
+                        !Number.isFinite(latitude) ||
+                        !Number.isFinite(longitude) ||
+                        distanceInKm(
+                            searchOrigin,
+                            { latitude, longitude }
+                        ) > radiusKm
                     ) {
                         continue;
                     }
@@ -3772,8 +3871,8 @@
                 );
 
                 status.textContent = markerCount
-                    ? `${markerCount} Google Maps place(s) found within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`
-                    : `Google Maps returned no matching places within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`;
+                    ? `${markerCount} ${resultSource} place(s) found within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}, sorted by distance.`
+                    : `${resultSource} returned no matching places within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`;
 
             } catch (error) {
 
