@@ -3722,8 +3722,7 @@
                 let resultSource = "Google Maps";
                 const shouldUseFallback =
                     !googleData ||
-                    googleData.elements.length === 0 ||
-                    googleData.failedSearchCount > 0;
+                    googleData.elements.length === 0;
 
                 if (shouldUseFallback) {
                     try {
