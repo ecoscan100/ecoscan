@@ -3705,47 +3705,10 @@
                     longitude: preciseLocation.longitude
                 };
 
-                let googleData = null;
-                try {
-                    googleData = await searchGooglePlaces(
-                        searchOrigin,
-                        radiusKm
-                    );
-                } catch (googleError) {
-                    console.warn(
-                        "Google Maps search failed; trying OpenStreetMap data:",
-                        googleError
-                    );
-                }
-
-                let data = googleData;
-                let resultSource = "Google Maps";
-                const shouldUseFallback =
-                    !googleData ||
-                    googleData.elements.length === 0;
-
-                if (shouldUseFallback) {
-                    try {
-                        data = await fetchNearbyWasteBanks(
-                            searchOrigin,
-                            radiusKm
-                        );
-                        resultSource = "OpenStreetMap";
-                    } catch (fallbackError) {
-                        console.warn(
-                            "OpenStreetMap fallback failed:",
-                            fallbackError
-                        );
-
-                        if (!googleData?.elements.length) {
-                            throw fallbackError;
-                        }
-
-                        data = googleData;
-                        resultSource =
-                            "Google Maps (some searches unavailable)";
-                    }
-                }
+                const data = await searchGooglePlaces(
+                    searchOrigin,
+                    radiusKm
+                );
 
                 const uniqueElements = new Map();
 
@@ -3870,8 +3833,8 @@
                 );
 
                 status.textContent = markerCount
-                    ? `${markerCount} ${resultSource} place(s) found within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}, sorted by distance.`
-                    : `${resultSource} returned no matching places within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`;
+                    ? `${markerCount} Google Places result(s) found within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}, sorted by distance.`
+                    : `Google Places found no matching places within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`;
 
             } catch (error) {
 
@@ -3881,8 +3844,8 @@
                 );
 
                 status.textContent = error.name === "AbortError"
-                    ? "Google Maps search timed out. Please try again."
-                    : error.message || "Could not search Google Maps right now.";
+                    ? "Google Places search timed out. Please try again."
+                    : error.message || "Could not search Google Places right now.";
 
             } finally {
 
