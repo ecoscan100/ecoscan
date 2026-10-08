@@ -2630,9 +2630,15 @@
             zh: ["回收站", "废品回收", "再生资源"]
         };
 
+        const WASTE_BANK_MAX_SEARCH_REQUESTS = 100;
+        const WASTE_BANK_MAX_SEARCH_DEPTH = 4;
+        const WASTE_BANK_MAX_CONCURRENT_REQUESTS = 8;
+
+
         async function searchGooglePlaces(
             origin,
-            radiusKm
+            radiusKm,
+            onProgress = () => {}
         ) {
 
             const browserLocale =
@@ -2652,7 +2658,7 @@
                 ...localTerms.slice(0, 2),
                 ...commonTerms
             ])).slice(0, 4);
-            const latitudeDelta = radiusKm / 111;
+            const latitudeDelta = radiusKm / 110.6;
             const longitudeDelta = Math.min(
                 180,
                 radiusKm /
@@ -2661,132 +2667,263 @@
                         Math.cos(origin.latitude * Math.PI / 180)
                     ))
             );
-            const normalizeLongitude = longitude =>
-                ((longitude + 540) % 360) - 180;
-            const searchBounds = new LatLngBounds(
-                {
-                    lat: Math.max(-90, origin.latitude - latitudeDelta),
-                    lng: normalizeLongitude(
-                        origin.longitude - longitudeDelta
-                    )
-                },
-                {
-                    lat: Math.min(90, origin.latitude + latitudeDelta),
-                    lng: normalizeLongitude(
-                        origin.longitude + longitudeDelta
-                    )
-                }
+            const initialBounds = {
+                south: Math.max(-90, origin.latitude - latitudeDelta),
+                north: Math.min(90, origin.latitude + latitudeDelta),
+                west: origin.longitude - longitudeDelta,
+                east: origin.longitude + longitudeDelta
+            };
+            const pendingRequests = searchTerms.map(
+                searchTerm => ({
+                    searchTerm,
+                    bounds: initialBounds,
+                    depth: 0
+                })
             );
-            const searchPlaces = async function(searchTerm) {
+            const placesById = new Map();
+            let requestsUsed = 0;
+            let failedRequests = 0;
+            let saturatedAtMaxDepth = false;
+            let firstError = null;
 
-                const response = await Place.searchByText({
-                    textQuery: searchTerm,
-                    fields: [
-                        "id",
-                        "displayName",
-                        "formattedAddress",
-                        "location",
-                        "primaryType",
-                        "primaryTypeDisplayName",
-                        "types",
-                        "googleMapsURI"
-                    ],
-                    locationBias: searchBounds,
-                    maxResultCount: 20,
-                    rankPreference: "DISTANCE",
-                    language: browserLocale
+            const createBounds = function(bounds) {
+                const normalizeLongitude = longitude =>
+                    ((longitude + 540) % 360) - 180;
+
+                return new LatLngBounds(
+                    {
+                        lat: bounds.south,
+                        lng: normalizeLongitude(bounds.west)
+                    },
+                    {
+                        lat: bounds.north,
+                        lng: normalizeLongitude(bounds.east)
+                    }
+                );
+            };
+            const intersectsSearchRadius = function(bounds) {
+                const latitude = Math.max(
+                    bounds.south,
+                    Math.min(bounds.north, origin.latitude)
+                );
+                const longitude = Math.max(
+                    bounds.west,
+                    Math.min(bounds.east, origin.longitude)
+                );
+
+                return distanceInKm(
+                    origin,
+                    { latitude, longitude }
+                ) <= radiusKm + 0.01;
+            };
+
+            while (
+                pendingRequests.length > 0 &&
+                requestsUsed < WASTE_BANK_MAX_SEARCH_REQUESTS
+            ) {
+
+                pendingRequests.sort(
+                    (first, second) =>
+                        first.depth - second.depth ||
+                        first.bounds.south - second.bounds.south ||
+                        first.bounds.west - second.bounds.west ||
+                        searchTerms.indexOf(first.searchTerm) -
+                            searchTerms.indexOf(second.searchTerm)
+                );
+
+                const batch = pendingRequests.splice(
+                    0,
+                    Math.min(
+                        WASTE_BANK_MAX_CONCURRENT_REQUESTS,
+                        WASTE_BANK_MAX_SEARCH_REQUESTS - requestsUsed
+                    )
+                );
+                requestsUsed += batch.length;
+                onProgress({
+                    requestsUsed,
+                    requestsRemaining:
+                        pendingRequests.length + batch.length
                 });
 
-                return {
-                    searchTerm,
-                    places: response.places || []
-                };
+                const batchResults = await Promise.allSettled(
+                    batch.map(async request => {
+                        const response = await Place.searchByText({
+                            textQuery: request.searchTerm,
+                            fields: [
+                                "id",
+                                "displayName",
+                                "formattedAddress",
+                                "location",
+                                "primaryType",
+                                "primaryTypeDisplayName",
+                                "types",
+                                "googleMapsURI"
+                            ],
+                            locationRestriction:
+                                createBounds(request.bounds),
+                            maxResultCount: 20,
+                            rankPreference: "DISTANCE",
+                            language: browserLocale
+                        });
 
-            };
-            const searches = await Promise.allSettled(
-                searchTerms.map(searchPlaces)
-            );
-
-            const successfulSearches = searches.filter(
-                result => result.status === "fulfilled"
-            );
-
-            if (successfulSearches.length === 0) {
-                const firstError = searches.find(
-                    result => result.status === "rejected"
+                        return {
+                            ...request,
+                            places: response.places || []
+                        };
+                    })
                 );
 
-                throw firstError?.reason || new Error(
-                    "Google Places search is temporarily unavailable."
-                );
-            }
+                for (let index = 0; index < batchResults.length; index += 1) {
 
-            const placesById = new Map();
+                    const result = batchResults[index];
 
-            for (const result of successfulSearches) {
-
-                for (const place of result.value.places) {
-
-                    const latitude = typeof place.location?.lat === "function"
-                        ? place.location.lat()
-                        : Number(place.location?.lat);
-                    const longitude = typeof place.location?.lng === "function"
-                        ? place.location.lng()
-                        : Number(place.location?.lng);
-
-                    if (
-                        !Number.isFinite(latitude) ||
-                        !Number.isFinite(longitude) ||
-                        distanceInKm(
-                            origin,
-                            { latitude, longitude }
-                        ) > radiusKm
-                    ) {
-                        continue;
-                    }
-
-                    const placeId = String(
-                        place.id || `${latitude}/${longitude}`
-                    );
-                    const existing = placesById.get(placeId);
-
-                    if (existing) {
-                        existing.matchedPhrases.add(
-                            result.value.searchTerm
+                    if (result.status === "rejected") {
+                        failedRequests += 1;
+                        console.error(
+                            "Google Places tile search failed:",
+                            result.reason
                         );
+
+                        if (firstError === null) {
+                            firstError = result.reason;
+                        }
+
                         continue;
                     }
 
-                    const name =
-                        typeof place.displayName === "string"
-                            ? place.displayName
-                            : place.displayName?.text || "Waste bank or recycling center";
-                    const placeType =
-                        typeof place.primaryTypeDisplayName === "string"
-                            ? place.primaryTypeDisplayName
-                            : place.primaryTypeDisplayName?.text ||
-                                place.primaryType ||
-                                place.types?.[0] ||
-                                "waste bank";
+                    const request = result.value;
 
-                    placesById.set(placeId, {
-                        type: "google",
-                        id: placeId,
-                        lat: latitude,
-                        lon: longitude,
-                        address: place.formattedAddress || "",
-                        tags: {
-                            name,
-                            amenity: placeType,
-                            googleMapsURI: place.googleMapsURI
-                        },
-                        matchedPhrases: new Set([
-                            result.value.searchTerm
-                        ])
-                    });
+                    for (const place of request.places) {
+
+                        const latitude =
+                            typeof place.location?.lat === "function"
+                                ? place.location.lat()
+                                : Number(place.location?.lat);
+                        const longitude =
+                            typeof place.location?.lng === "function"
+                                ? place.location.lng()
+                                : Number(place.location?.lng);
+
+                        if (
+                            !Number.isFinite(latitude) ||
+                            !Number.isFinite(longitude) ||
+                            distanceInKm(
+                                origin,
+                                { latitude, longitude }
+                            ) > radiusKm
+                        ) {
+                            continue;
+                        }
+
+                        const placeId = String(
+                            place.id || `${latitude}/${longitude}`
+                        );
+                        const existing = placesById.get(placeId);
+
+                        if (existing) {
+                            existing.matchedPhrases.add(
+                                request.searchTerm
+                            );
+                            continue;
+                        }
+
+                        const name =
+                            typeof place.displayName === "string"
+                                ? place.displayName
+                                : place.displayName?.text ||
+                                    "Waste bank or recycling center";
+                        const placeType =
+                            typeof place.primaryTypeDisplayName === "string"
+                                ? place.primaryTypeDisplayName
+                                : place.primaryTypeDisplayName?.text ||
+                                    place.primaryType ||
+                                    place.types?.[0] ||
+                                    "waste bank";
+
+                        placesById.set(placeId, {
+                            type: "google",
+                            id: placeId,
+                            lat: latitude,
+                            lon: longitude,
+                            address: place.formattedAddress || "",
+                            tags: {
+                                name,
+                                amenity: placeType,
+                                googleMapsURI: place.googleMapsURI
+                            },
+                            matchedPhrases: new Set([
+                                request.searchTerm
+                            ])
+                        });
+
+                    }
+
+                    if (request.places.length >= 20) {
+
+                        if (
+                            request.depth >=
+                            WASTE_BANK_MAX_SEARCH_DEPTH
+                        ) {
+                            saturatedAtMaxDepth = true;
+                            continue;
+                        }
+
+                        const midpointLatitude =
+                            (request.bounds.south + request.bounds.north) / 2;
+                        const midpointLongitude =
+                            (request.bounds.west + request.bounds.east) / 2;
+                        const childBounds = [
+                            {
+                                south: request.bounds.south,
+                                north: midpointLatitude,
+                                west: request.bounds.west,
+                                east: midpointLongitude
+                            },
+                            {
+                                south: request.bounds.south,
+                                north: midpointLatitude,
+                                west: midpointLongitude,
+                                east: request.bounds.east
+                            },
+                            {
+                                south: midpointLatitude,
+                                north: request.bounds.north,
+                                west: request.bounds.west,
+                                east: midpointLongitude
+                            },
+                            {
+                                south: midpointLatitude,
+                                north: request.bounds.north,
+                                west: midpointLongitude,
+                                east: request.bounds.east
+                            }
+                        ];
+
+                        for (const bounds of childBounds) {
+                            if (intersectsSearchRadius(bounds)) {
+                                pendingRequests.push({
+                                    searchTerm: request.searchTerm,
+                                    bounds,
+                                    depth: request.depth + 1
+                                });
+                            }
+                        }
+
+                    }
 
                 }
 
+                onProgress({
+                    requestsUsed,
+                    requestsRemaining: pendingRequests.length
+                });
+
+            }
+
+            if (placesById.size === 0 && failedRequests > 0) {
+                throw firstError || new Error(
+                    "Google Places search is temporarily unavailable."
+                );
             }
 
             return {
@@ -2799,7 +2936,11 @@
                                 place.matchedPhrases
                             )
                         })
-                    )
+                    ),
+                requestsUsed,
+                failedRequests,
+                requestLimitReached: pendingRequests.length > 0,
+                saturatedAtMaxDepth
             };
 
         }
@@ -3058,7 +3199,11 @@
 
                 const data = await searchGooglePlaces(
                     searchOrigin,
-                    radiusKm
+                    radiusKm,
+                    progress => {
+                        status.textContent =
+                            `Searching within ${radiusKm} km (${progress.requestsUsed}/${WASTE_BANK_MAX_SEARCH_REQUESTS} Google Places requests; ${progress.requestsRemaining} tile searches queued)...`;
+                    }
                 );
 
                 const uniqueElements = new Map();
@@ -3129,7 +3274,7 @@
                             )
                         );
                     }
-                ).slice(0, 20);
+                );
 
                 wasteBankLayer.clearLayers();
                 let markerCount = 0;
@@ -3165,9 +3310,33 @@
                     zoom
                 );
 
-                status.textContent = markerCount
-                    ? `Showing ${markerCount} nearest Google Places result(s) within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`
+                const searchSummary = markerCount
+                    ? `Showing ${markerCount} Google Places result(s) within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`
                     : `Google Places found no matching places within ${radiusKm} km of ${selectedCenter ? "the selected map point" : "your location"}.`;
+                const coverageWarnings = [];
+
+                if (data.requestLimitReached) {
+                    coverageWarnings.push(
+                        `Stopped at the ${WASTE_BANK_MAX_SEARCH_REQUESTS}-request scan limit; some crowded map tiles may have more results.`
+                    );
+                }
+
+                if (data.saturatedAtMaxDepth) {
+                    coverageWarnings.push(
+                        "Some crowded tiles could not be subdivided further."
+                    );
+                }
+
+                if (data.failedRequests > 0) {
+                    coverageWarnings.push(
+                        `${data.failedRequests} Google Places request(s) failed.`
+                    );
+                }
+
+                status.textContent = [
+                    searchSummary,
+                    ...coverageWarnings
+                ].join(" ");
 
             } catch (error) {
 
