@@ -1396,9 +1396,9 @@
                 </h1>
 
                 <p>
-                    Upload a photo of an object and
-                    EcoScan's AI will analyze the image
-                    and identify what it sees.
+                    Upload a photo and EcoScan's AI
+                    will analyze it on your device.
+                    The model downloads the first time.
                 </p>
 
             </div>
@@ -1564,20 +1564,80 @@
 
     </div>
 
-    <script>
+    <script type="module">
 
         /* ==============================
-           SUPABASE
+           BROWSER AI
         ============================== */
 
-        const SUPABASE_URL =
-            "https://nfajggmjrloccvnvdlke.supabase.co";
+        const AI_MODEL_ID =
+            "Xenova/convnext-tiny-224";
 
-        const SUPABASE_KEY =
-            "sb_publishable_lbTp0UEIRl24JS4aime6TA_Moz9q037";
+        let classifierPromise = null;
 
-        const FUNCTION_URL =
-            `${SUPABASE_URL}/functions/v1/analyze-waste`;
+        async function getImageClassifier() {
+
+            if (!classifierPromise) {
+
+                classifierPromise =
+                    import(
+                        "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2/+esm"
+                    )
+                    .then(
+                        function(transformers) {
+
+                            return transformers.pipeline(
+                                "image-classification",
+                                AI_MODEL_ID,
+                                {
+                                    dtype: "q8",
+
+                                    progress_callback:
+                                        function(progress) {
+
+                                            if (
+                                                progress.status === "progress" &&
+                                                Number.isFinite(progress.progress)
+                                            ) {
+
+                                                analyzeButton.innerText =
+                                                    "Downloading AI model " +
+                                                    `${Math.round(progress.progress)}%...`;
+
+                                            } else if (
+                                                progress.status === "ready"
+                                            ) {
+
+                                                analyzeButton.innerText =
+                                                    "Loading AI model...";
+
+                                            }
+
+                                        }
+                                }
+                            );
+
+                        }
+                    )
+                    .catch(
+                        function(error) {
+
+                            classifierPromise = null;
+
+                            throw new Error(
+                                "Could not load the browser AI model. " +
+                                "Check your internet connection and try again. " +
+                                error.message
+                            );
+
+                        }
+                    );
+
+            }
+
+            return classifierPromise;
+
+        }
 
 
         /* ==============================
@@ -2213,163 +2273,60 @@
 
             if (!selectedFile) {
 
-                alert(
-                    "Please select an image first."
-                );
-
+                alert("Please select an image first.");
                 return;
 
             }
 
-
-            analyzeButton.disabled =
-                true;
-
-
-            analyzeButton.innerText =
-                "Analyzing with AI...";
-
+            analyzeButton.disabled = true;
+            analyzeButton.innerText = "Loading browser AI...";
 
             try {
 
-                const imageBase64 =
-                    await fileToBase64(
-                        selectedFile
-                    );
+                const imageBase64 = await fileToBase64(selectedFile);
+                const classifier = await getImageClassifier();
 
+                analyzeButton.innerText = "Analyzing on your device...";
 
-                const response =
-                    await fetch(
-                        FUNCTION_URL,
-                        {
+                const predictions = await classifier(
+                    imageBase64,
+                    { top_k: 5 }
+                );
 
-                            method:
-                                "POST",
-
-                            headers: {
-
-                                "apikey":
-                                    SUPABASE_KEY,
-
-                                "Authorization":
-                                    `Bearer ${SUPABASE_KEY}`,
-
-                                "Content-Type":
-                                    "application/json"
-
-                            },
-
-                            body:
-                                JSON.stringify({
-
-                                    image:
-                                        imageBase64
-
-                                })
-
-                        }
-                    );
-
-
-                const result =
-                    await response.json();
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        result.error ||
-                        result.details ||
-                        `AI request failed: ${response.status}`
-                    );
-
+                if (!Array.isArray(predictions) || predictions.length === 0) {
+                    throw new Error("AI returned no predictions.");
                 }
 
-
-                if (
-                    !result.predictions ||
-                    result.predictions.length === 0
-                ) {
-
-                    throw new Error(
-                        "AI returned no predictions."
-                    );
-
-                }
-
-
-                const topPrediction =
-                    result.predictions[0];
-
-
-                const aiLabel =
-                    topPrediction.label ||
-                    "Unknown";
-
-
-                const aiConfidence =
-                    Number(
-                        topPrediction.score || 0
-                    );
-
-
+                const topPrediction = predictions[0];
                 const scanResult = {
-
-                    image:
-                        imageBase64,
-
-                    label:
-                        aiLabel,
-
-                    confidence:
-                        aiConfidence,
-
-                    predictions:
-                        result.predictions,
-
-                    fileName:
-                        selectedFile.name
-
+                    image: imageBase64,
+                    label: topPrediction.label || "Unknown",
+                    confidence: Number(topPrediction.score || 0),
+                    predictions: predictions,
+                    fileName: selectedFile.name
                 };
-
 
                 sessionStorage.setItem(
                     "ecoScanAIResult",
-                    JSON.stringify(
-                        scanResult
-                    )
+                    JSON.stringify(scanResult)
                 );
 
-
-                window.location.href =
-                    "result.html";
-
+                window.location.href = "result.html";
 
             } catch (error) {
 
-                console.error(
-                    "AI analysis failed:",
-                    error
-                );
-
-
+                console.error("AI analysis failed:", error);
                 alert(
                     "AI analysis failed.\n\n" +
-                    error.message
+                    (error instanceof Error ? error.message : String(error))
                 );
 
-
-                analyzeButton.disabled =
-                    false;
-
-
-                analyzeButton.innerText =
-                    "Analyze Waste →";
+                analyzeButton.disabled = false;
+                analyzeButton.innerText = "Analyze Waste →";
 
             }
 
         }
-
     </script>
 
 </body>
