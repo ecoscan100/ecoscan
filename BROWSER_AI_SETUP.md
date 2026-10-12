@@ -1,11 +1,11 @@
 # Browser AI
 
-Waste scans run directly in the browser with Transformers.js and the quantized `Xenova/convnext-tiny-224` image-classification model. Images are not sent to Supabase or an inference API, so scans do not use Hugging Face Inference Providers credits and do not need a Supabase Edge Function.
+Waste scans run in the browser using Transformers.js and the quantized `Xenova/convnext-tiny-224` image-classification model. Inference happens on the user's device; scan images are not sent to an AI server. The browser downloads the model on the first scan and stores its files in the Transformers.js Cache API cache.
 
-On the first scan, the browser downloads the Transformers.js runtime and approximately 29 MB of quantized model weights from public CDNs. The browser caches model files for later use. Internet access is needed for the initial download; classification runs on the user's device afterward.
+On the scan page, choose **Keep AI on this device** to retain the cached model for faster future scans, or **Delete saved AI** to remove the Transformers.js model cache immediately. The model will be downloaded again if another scan is started after deletion.
 
 ## Model limitations
 
 ConvNeXt Tiny is pretrained on ImageNet-1k, not a waste-sorting dataset. It can recognize common objects but may not identify waste material or disposal categories accurately. EcoScan's disposal guidance is an estimate and should be checked against local rules.
 
-The page runs inference with WebAssembly on the device CPU. Performance depends on the device. The model is loaded only after the user starts the first scan.
+The page runs inference with WebAssembly on the device CPU. Performance depends on the device. The model is loaded only after the user starts a scan.

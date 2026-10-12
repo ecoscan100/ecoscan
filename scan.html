@@ -1066,6 +1066,63 @@
             font-size: 11px;
         }
 
+        .ai-storage {
+            margin-top: 24px;
+            padding: 20px;
+            border: 1px solid rgba(85, 230, 139, 0.14);
+            border-radius: 16px;
+            background: rgba(5, 24, 15, 0.55);
+        }
+
+        .ai-storage h2 {
+            margin: 0 0 7px;
+            color: #e8fff0;
+            font-size: 14px;
+        }
+
+        .ai-storage p {
+            margin: 0 0 14px;
+            color: rgba(213, 235, 222, 0.62);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .ai-storage-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ai-storage-actions button {
+            min-height: 38px;
+            padding: 8px 13px;
+            border: 1px solid rgba(85, 230, 139, 0.24);
+            border-radius: 9px;
+            background: rgba(42, 151, 82, 0.12);
+            color: #b8f7d0;
+            font: inherit;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .ai-storage-actions button:hover:not(:disabled) {
+            border-color: rgba(85, 230, 139, 0.55);
+            background: rgba(42, 151, 82, 0.22);
+        }
+
+        .ai-storage-actions button:disabled {
+            opacity: 0.55;
+            cursor: wait;
+        }
+
+        .ai-storage-status {
+            min-height: 18px;
+            margin-top: 10px;
+            color: rgba(213, 235, 222, 0.68);
+            font-size: 11px;
+        }
+
         .school-project {
             padding: 0 20px 35px;
 
@@ -1398,7 +1455,7 @@
                 <p>
                     Upload a photo and EcoScan's AI
                     will analyze it on your device.
-                    The model downloads the first time.
+                    The model is loaded when you scan.
                 </p>
 
             </div>
@@ -1552,6 +1609,49 @@
 
                 </div>
 
+                <section
+                    class="ai-storage"
+                    aria-labelledby="aiStorageTitle"
+                >
+
+                    <h2 id="aiStorageTitle">
+                        AI model storage
+                    </h2>
+
+                    <p>
+                        Keep the model in this browser for faster
+                        future scans, or remove its cached files now.
+                    </p>
+
+                    <div class="ai-storage-actions">
+
+                        <button
+                            type="button"
+                            id="keepAIButton"
+                        >
+                            Keep AI on this device
+                        </button>
+
+                        <button
+                            type="button"
+                            id="deleteAIButton"
+                        >
+                            Delete saved AI
+                        </button>
+
+                    </div>
+
+                    <div
+                        class="ai-storage-status"
+                        id="aiStorageStatus"
+                        role="status"
+                        aria-live="polite"
+                    >
+                        The model stays in this browser until you delete it here.
+                    </div>
+
+                </section>
+
             </div>
 
         </div>
@@ -1590,30 +1690,7 @@
                                 "image-classification",
                                 AI_MODEL_ID,
                                 {
-                                    dtype: "q8",
-
-                                    progress_callback:
-                                        function(progress) {
-
-                                            if (
-                                                progress.status === "progress" &&
-                                                Number.isFinite(progress.progress)
-                                            ) {
-
-                                                analyzeButton.innerText =
-                                                    "Downloading AI model " +
-                                                    `${Math.round(progress.progress)}%...`;
-
-                                            } else if (
-                                                progress.status === "ready"
-                                            ) {
-
-                                                analyzeButton.innerText =
-                                                    "Loading AI model...";
-
-                                            }
-
-                                        }
+                                    dtype: "q8"
                                 }
                             );
 
@@ -1667,6 +1744,15 @@
 
         const analyzeButton =
             document.getElementById("analyzeButton");
+
+        const keepAIButton =
+            document.getElementById("keepAIButton");
+
+        const deleteAIButton =
+            document.getElementById("deleteAIButton");
+
+        const aiStorageStatus =
+            document.getElementById("aiStorageStatus");
 
         const preview =
             document.getElementById("preview");
@@ -1801,6 +1887,108 @@
                 event.stopPropagation();
 
                 analyzeImage();
+
+            }
+        );
+
+        keepAIButton.addEventListener(
+            "click",
+            async function() {
+
+                if (!("caches" in window)) {
+
+                    aiStorageStatus.textContent =
+                        "This browser does not expose model cache controls.";
+
+                    return;
+
+                }
+
+                keepAIButton.disabled =
+                    true;
+
+                try {
+
+                    const isCached =
+                        await window.caches.has(
+                            "transformers-cache"
+                        );
+
+                    aiStorageStatus.textContent =
+                        isCached
+                            ? "The cached AI model will stay in this browser for faster future scans."
+                            : "The model is not cached yet. It will be kept after the next scan.";
+
+                } catch (error) {
+
+                    console.error(
+                        "Could not check the AI model cache:",
+                        error
+                    );
+
+                    aiStorageStatus.textContent =
+                        "Could not check browser storage. The model cache has not been changed.";
+
+                } finally {
+
+                    keepAIButton.disabled =
+                        false;
+
+                }
+
+            }
+        );
+
+        deleteAIButton.addEventListener(
+            "click",
+            async function() {
+
+                if (!("caches" in window)) {
+
+                    aiStorageStatus.textContent =
+                        "This browser does not support removing the AI model cache.";
+
+                    return;
+
+                }
+
+                deleteAIButton.disabled =
+                    true;
+
+                aiStorageStatus.textContent =
+                    "Removing the saved AI model...";
+
+                try {
+
+                    const deleted =
+                        await window.caches.delete(
+                            "transformers-cache"
+                        );
+
+                    classifierPromise =
+                        null;
+
+                    aiStorageStatus.textContent =
+                        deleted
+                            ? "Saved AI model removed. It will load again if you scan another image."
+                            : "No saved model files were found. The model is no longer kept in memory on this page.";
+
+                } catch (error) {
+
+                    console.error(
+                        "Could not remove the saved AI model:",
+                        error
+                    );
+
+                    aiStorageStatus.textContent =
+                        "Could not remove the saved AI model. Check browser storage permissions and try again.";
+
+                } finally {
+
+                    deleteAIButton.disabled =
+                        false;
+
+                }
 
             }
         );
@@ -2278,26 +2466,46 @@
 
             }
 
-            analyzeButton.disabled = true;
-            analyzeButton.innerText = "Loading browser AI...";
+            analyzeButton.disabled =
+                true;
+
+            keepAIButton.disabled =
+                true;
+
+            deleteAIButton.disabled =
+                true;
+
+            analyzeButton.innerText =
+                "Loading AI...";
 
             try {
 
-                const imageBase64 = await fileToBase64(selectedFile);
-                const classifier = await getImageClassifier();
+                const imageBase64 =
+                    await fileToBase64(
+                        selectedFile
+                    );
 
-                analyzeButton.innerText = "Analyzing on your device...";
+                const classifier =
+                    await getImageClassifier();
 
-                const predictions = await classifier(
-                    imageBase64,
-                    { top_k: 5 }
-                );
+                analyzeButton.innerText =
+                    "Analyzing image...";
+
+                const predictions =
+                    await classifier(
+                        imageBase64,
+                        {
+                            top_k: 5
+                        }
+                    );
 
                 if (!Array.isArray(predictions) || predictions.length === 0) {
                     throw new Error("AI returned no predictions.");
                 }
 
-                const topPrediction = predictions[0];
+                const topPrediction =
+                    predictions[0];
+
                 const scanResult = {
                     image: imageBase64,
                     label: topPrediction.label || "Unknown",
@@ -2322,6 +2530,8 @@
                 );
 
                 analyzeButton.disabled = false;
+                keepAIButton.disabled = false;
+                deleteAIButton.disabled = false;
                 analyzeButton.innerText = "Analyze Waste →";
 
             }
