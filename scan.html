@@ -1590,7 +1590,31 @@
                                 "image-classification",
                                 AI_MODEL_ID,
                                 {
-                                    dtype: "q8"
+                                    dtype: "q8",
+
+                                    progress_callback:
+                                        function(progress) {
+
+                                            if (
+                                                progress.status === "progress" &&
+                                                Number.isFinite(progress.progress)
+                                            ) {
+
+                                                const percent =
+                                                    Math.min(
+                                                        99,
+                                                        Math.max(
+                                                            0,
+                                                            Math.round(progress.progress)
+                                                        )
+                                                    );
+
+                                                analyzeButton.innerText =
+                                                    `Loading AI... ${percent}%`;
+
+                                            }
+
+                                        }
                                 }
                             );
 
@@ -2258,7 +2282,7 @@
                 true;
 
             analyzeButton.innerText =
-                "Loading AI...";
+                "Loading AI... 0%";
 
             try {
 

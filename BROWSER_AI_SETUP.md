@@ -2,6 +2,8 @@
 
 Waste scans run in the browser using Transformers.js and the quantized `Xenova/convnext-tiny-224` image-classification model. Inference happens on the user's device; scan images are not sent to an AI server. The browser downloads the model on the first scan and stores its files in the Transformers.js Cache API cache.
 
+While model files are loading, the scan button displays the download progress reported by Transformers.js.
+
 After a scan completes, choose **Keep AI locally** to retain the cached model for faster future scans, or **Delete AI from this device** to remove the Transformers.js model cache immediately. The model will be loaded again if another scan is started after deletion.
 
 ## Model limitations

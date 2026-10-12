@@ -1530,10 +1530,16 @@
 
         .reuse-panel {
             margin-top: 12px;
-            padding: 15px;
-            border: 1px solid rgba(93, 226, 139, 0.16);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.035);
+            padding: 18px;
+            border: 1px solid rgba(93, 226, 139, 0.2);
+            border-radius: 14px;
+            background:
+                radial-gradient(
+                    circle at 100% 0,
+                    rgba(48, 160, 97, 0.12),
+                    transparent 45%
+                ),
+                rgba(255,255,255,0.035);
         }
 
 
@@ -1543,57 +1549,101 @@
 
 
         .reuse-panel-title {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             color: #e4f0e8;
-            font-size: 13px;
-            font-weight: 800;
+            font-size: 16px;
+            font-weight: 850;
         }
 
 
-        .reuse-form {
-            display: flex;
-            gap: 8px;
-        }
-
-
-        .reuse-form input {
-            min-width: 0;
-            min-height: 42px;
-            flex: 1;
-            padding: 0 12px;
-            border: 1px solid rgba(255,255,255,0.14);
-            border-radius: 7px;
-            background: rgba(0,0,0,0.2);
-            color: #f2f8f4;
-        }
-
-
-        .reuse-form button {
-            min-height: 42px;
-            padding: 0 14px;
-            border: 0;
-            border-radius: 7px;
-            background: #238755;
-            color: #fff;
+        .reuse-panel-intro {
+            margin: 0 0 14px;
+            color: #9bb5a5;
             font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-
-        .reuse-note {
-            margin-top: 8px;
-            color: #82998b;
-            font-size: 10px;
+            line-height: 1.6;
         }
 
 
         .reuse-ideas-list {
-            margin: 0 0 12px;
-            padding-left: 18px;
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(min(100%, 190px), 1fr)
+            );
+            gap: 9px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+
+        .reuse-search-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            margin-top: 14px;
+            padding: 0 14px;
+            border: 1px solid rgba(93, 226, 139, 0.32);
+            border-radius: 9px;
+            background: rgba(35, 135, 85, 0.2);
+            color: #a8f0bd;
+            font-size: 11px;
+            font-weight: 800;
+            text-decoration: none;
+            transition:
+                background 160ms ease,
+                border-color 160ms ease;
+        }
+
+
+        .reuse-search-link:hover,
+        .reuse-search-link:focus-visible {
+            border-color: rgba(93, 226, 139, 0.65);
+            background: rgba(35, 135, 85, 0.34);
+        }
+
+
+        .reuse-search-note {
+            margin: 7px 0 0;
+            color: #82998b;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+
+        .reuse-idea-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            min-height: 78px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            background: rgba(3, 18, 11, 0.38);
+        }
+
+
+        .reuse-idea-number {
+            display: grid;
+            width: 25px;
+            height: 25px;
+            flex: 0 0 25px;
+            place-items: center;
+            border: 1px solid rgba(93, 226, 139, 0.24);
+            border-radius: 8px;
+            background: rgba(35, 135, 85, 0.18);
+            color: #79e5a0;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+
+        .reuse-idea-text {
+            margin: 2px 0 0;
             color: #b1c9ba;
             font-size: 11px;
-            line-height: 1.8;
+            line-height: 1.55;
         }
 
 
@@ -3214,41 +3264,38 @@
                             <div
                                 class="reuse-panel-title"
                                 id="reuseIdeasTitle"
+                                tabindex="-1"
                             >
-                                Reuse inspiration
+                                Ideas for a second life
                             </div>
 
-                            <ul
+                            <p
+                                class="reuse-panel-intro"
+                                id="reuseIdeasIntro"
+                            >
+                                Practical tips for this item, without sending
+                                your photo online.
+                            </p>
+
+                            <ol
                                 class="reuse-ideas-list"
                                 id="reuseIdeasList"
-                            ></ul>
+                            ></ol>
 
-                            <form
-                                class="reuse-form"
-                                action="https://duckduckgo.com/"
-                                method="get"
+                            <a
+                                class="reuse-search-link"
+                                id="reuseSearchLink"
+                                href="https://www.google.com/search?q=upcycling+reuse+project+ideas"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
+                                Search online for more ideas
+                            </a>
 
-                                <input
-                                    type="search"
-                                    id="reuseIdeaQuery"
-                                    name="q"
-                                    aria-label="Search for reuse ideas"
-                                    placeholder="Search reuse ideas"
-                                    required
-                                >
-
-                                <button type="submit">
-                                    Search
-                                </button>
-
-                            </form>
-
-                            <div class="reuse-note">
-                                Search opens in a new tab. Your photo is not shared.
-                            </div>
+                            <p class="reuse-search-note">
+                                Opens a web search for this item. Only its name
+                                and category are included; your photo stays here.
+                            </p>
 
                         </section>
 
@@ -3678,6 +3725,58 @@
                 "Offer it for donation, swapping, or parts before disposal.",
                 "Recycle it through a local program if reuse is not practical."
             ];
+
+        }
+
+
+        function renderReuseIdeas(label, category) {
+
+            const ideas =
+                getReuseIdeas(label, category);
+            const list =
+                document.getElementById("reuseIdeasList");
+
+            document.getElementById(
+                "reuseIdeasIntro"
+            ).textContent =
+                `Practical ideas for ${label}. Want more options? Search online below.`;
+
+            document.getElementById(
+                "reuseSearchLink"
+            ).href =
+                "https://www.google.com/search?q=" +
+                encodeURIComponent(
+                    `upcycling reuse project ideas for ${label} ${category}`
+                );
+
+            list.replaceChildren(
+                ...ideas.map(function(idea, index) {
+
+                    const item =
+                        document.createElement("li");
+                    const number =
+                        document.createElement("span");
+                    const text =
+                        document.createElement("p");
+
+                    item.className =
+                        "reuse-idea-card";
+                    number.className =
+                        "reuse-idea-number";
+                    number.setAttribute("aria-hidden", "true");
+                    number.textContent =
+                        String(index + 1).padStart(2, "0");
+                    text.className =
+                        "reuse-idea-text";
+                    text.textContent =
+                        idea;
+
+                    item.append(number, text);
+
+                    return item;
+
+                })
+            );
 
         }
 
@@ -4209,20 +4308,9 @@
                     "confirmTextileButton"
                 ).hidden = !classification.requiresConfirmation;
 
-                document.getElementById(
-                    "reuseIdeaQuery"
-                ).value =
-                    `Creative ways to reuse ${aiLabel}`;
-
-                document.getElementById(
-                    "reuseIdeasList"
-                ).replaceChildren(
-                    ...getReuseIdeas(rawAILabel, classification.category)
-                        .map(function (idea) {
-                            const item = document.createElement("li");
-                            item.textContent = idea;
-                            return item;
-                        })
+                renderReuseIdeas(
+                    aiLabel,
+                    classification.category
                 );
 
                 document.getElementById("correctedLabel").value = aiLabel;
@@ -4310,7 +4398,7 @@
 
             if (!panel.hidden) {
                 document
-                    .getElementById("reuseIdeaQuery")
+                    .getElementById("reuseIdeasTitle")
                     .focus();
             }
 
@@ -4408,15 +4496,9 @@
                 document.getElementById("action").textContent = action;
                 document.getElementById("estimatedMass").textContent = massDisplay;
                 document.getElementById("recommendationText").textContent = recommendation;
-                document.getElementById("reuseIdeaQuery").value =
-                    `Creative ways to reuse ${correctedLabel}`;
-                document.getElementById("reuseIdeasList").replaceChildren(
-                    ...getReuseIdeas(correctedLabel, correctedCategory)
-                        .map(function (idea) {
-                            const item = document.createElement("li");
-                            item.textContent = idea;
-                            return item;
-                        })
+                renderReuseIdeas(
+                    correctedLabel,
+                    correctedCategory
                 );
 
                 window.currentScan = {
