@@ -385,6 +385,79 @@
 
         }
 
+        .ai-storage {
+
+            margin:
+                24px 0;
+
+            padding:
+                20px;
+
+            border:
+                1px solid
+                rgba(85, 230, 139, 0.14);
+
+            border-radius:
+                16px;
+
+            background:
+                rgba(5, 24, 15, 0.55);
+
+        }
+
+        .ai-storage[hidden] {
+            display: none;
+        }
+
+        .ai-storage h2 {
+            margin: 0 0 7px;
+            color: #e8fff0;
+            font-size: 14px;
+        }
+
+        .ai-storage p {
+            margin: 0 0 14px;
+            color: rgba(213, 235, 222, 0.62);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .ai-storage-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ai-storage-actions button {
+            min-height: 38px;
+            padding: 8px 13px;
+            border: 1px solid rgba(85, 230, 139, 0.24);
+            border-radius: 9px;
+            background: rgba(42, 151, 82, 0.12);
+            color: #b8f7d0;
+            font: inherit;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .ai-storage-actions button:hover:not(:disabled) {
+            border-color: rgba(85, 230, 139, 0.55);
+            background: rgba(42, 151, 82, 0.22);
+        }
+
+        .ai-storage-actions button:disabled {
+            opacity: 0.55;
+            cursor: wait;
+        }
+
+        .ai-storage-status {
+            min-height: 18px;
+            margin-top: 10px;
+            color: rgba(213, 235, 222, 0.68);
+            font-size: 11px;
+        }
+
 
         /* =====================================================
            MAIN RESULT CARD
@@ -3265,6 +3338,52 @@
             </section>
 
 
+            <section
+                class="ai-storage"
+                id="aiStoragePanel"
+                aria-labelledby="aiStorageTitle"
+                hidden
+            >
+
+                <h2 id="aiStorageTitle">
+                    Keep the AI model on this device?
+                </h2>
+
+                <p>
+                    Keeping it makes future scans smoother. Delete it
+                    to free this browser's model cache; it will load
+                    again if you scan later.
+                </p>
+
+                <div class="ai-storage-actions">
+
+                    <button
+                        type="button"
+                        id="keepAIButton"
+                        onclick="keepAIOnDevice()"
+                    >
+                        Keep AI locally
+                    </button>
+
+                    <button
+                        type="button"
+                        id="deleteAIButton"
+                        onclick="deleteSavedAI()"
+                    >
+                        Delete AI from this device
+                    </button>
+
+                </div>
+
+                <div
+                    class="ai-storage-status"
+                    id="aiStorageStatus"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+            </section>
+
 
             <div class="result-disclaimer">
 
@@ -4148,6 +4267,10 @@
 
                 } : null;
 
+                document.getElementById(
+                    "aiStoragePanel"
+                ).hidden = false;
+
             } catch (error) {
 
                 console.error(
@@ -4367,6 +4490,88 @@
                     document.getElementById("correctedMass").value
                 )
             };
+
+        }
+
+        async function keepAIOnDevice() {
+
+            const status =
+                document.getElementById("aiStorageStatus");
+
+            try {
+
+                const isCached =
+                    "caches" in window &&
+                    await window.caches.has("transformers-cache");
+
+                status.textContent =
+                    isCached
+                        ? "The AI model will stay in this browser for faster future scans."
+                        : "The model is not cached yet. It will stay here after the next scan.";
+
+            } catch (error) {
+
+                console.error(
+                    "Could not check the AI model cache:",
+                    error
+                );
+
+                status.textContent =
+                    "Could not check browser storage. The model cache has not been changed.";
+
+            }
+
+        }
+
+        async function deleteSavedAI() {
+
+            const button =
+                document.getElementById("deleteAIButton");
+
+            const status =
+                document.getElementById("aiStorageStatus");
+
+            if (!("caches" in window)) {
+
+                status.textContent =
+                    "This browser does not support removing the AI model cache.";
+
+                return;
+
+            }
+
+            button.disabled =
+                true;
+
+            status.textContent =
+                "Removing the saved AI model...";
+
+            try {
+
+                const deleted =
+                    await window.caches.delete("transformers-cache");
+
+                status.textContent =
+                    deleted
+                        ? "Saved AI model removed. It will load again if you scan another image."
+                        : "No saved AI model was found in this browser.";
+
+            } catch (error) {
+
+                console.error(
+                    "Could not remove the saved AI model:",
+                    error
+                );
+
+                status.textContent =
+                    "Could not remove the saved AI model. Check browser storage permissions and try again.";
+
+            } finally {
+
+                button.disabled =
+                    false;
+
+            }
 
         }
 
