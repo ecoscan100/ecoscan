@@ -22,6 +22,15 @@ create table if not exists public.scan_feedback (
     created_at timestamptz not null default now()
 );
 
+alter table public.scan_feedback
+    add column if not exists original_label text,
+    add column if not exists corrected_label text,
+    add column if not exists original_category text,
+    add column if not exists corrected_category text,
+    add column if not exists estimated_mass_grams integer,
+    add column if not exists model_confidence real,
+    add column if not exists model_predictions jsonb not null default '[]'::jsonb;
+
 alter table public.scan_feedback enable row level security;
 
 grant insert on public.scan_feedback to anon, authenticated;
@@ -35,3 +44,5 @@ create policy "Allow scan correction submissions"
     for insert
     to anon, authenticated
     with check (true);
+
+notify pgrst, 'reload schema';

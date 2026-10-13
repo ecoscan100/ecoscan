@@ -28,7 +28,7 @@
 
     <link
         rel="stylesheet"
-        href="css/style.css?v=20260929-nav-global"
+        href="css/style.css?v=20261013-reviews"
     >
 
     <title>
@@ -1702,6 +1702,41 @@
         }
 
 
+        .correction-progress {
+            grid-column: 1 / -1;
+            overflow: hidden;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.1);
+        }
+
+
+        .correction-progress[hidden] {
+            display: none;
+        }
+
+
+        .correction-progress-indicator {
+            display: block;
+            width: 42%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #238755, #79e5a0);
+            animation: correction-progress-slide 1.2s ease-in-out infinite;
+        }
+
+
+        @keyframes correction-progress-slide {
+            from {
+                transform: translateX(-110%);
+            }
+
+            to {
+                transform: translateX(250%);
+            }
+        }
+
+
         .correction-note,
         .correction-status {
             margin: 9px 0 0;
@@ -1713,6 +1748,14 @@
 
         .correction-status {
             color: #75eaa0;
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+            .correction-progress-indicator {
+                width: 100%;
+                animation: none;
+            }
         }
 
 
@@ -2867,6 +2910,12 @@
                 </a>
             </li>
 
+            <li>
+                <a href="reviews.html">
+                    Reviews
+                </a>
+            </li>
+
         </ul>
 
     </nav>
@@ -3336,6 +3385,17 @@
 
                                 <button type="submit" id="submitCorrectionButton">Submit correction</button>
 
+                                <div
+                                    class="correction-progress"
+                                    id="correctionProgress"
+                                    role="progressbar"
+                                    aria-label="Saving correction"
+                                    aria-valuetext="Sending correction to EcoScan"
+                                    hidden
+                                >
+                                    <span class="correction-progress-indicator"></span>
+                                </div>
+
                             </form>
 
                             <p class="correction-note">
@@ -3577,11 +3637,11 @@
         ===================================================== */
 
         const SUPABASE_URL =
-            "https://nfajggmjrloccvnvdlke.supabase.co";
+            "https://wyehzlwukwbdfajzqtqv.supabase.co";
 
 
         const SUPABASE_KEY =
-            "sb_publishable_lbTp0UEIRl24JS4aime6TA_Moz9q037";
+            "sb_publishable_qk5NHtgzibFwX8wyB2-OeQ_C2zQfpHd";
 
 
 
@@ -4433,6 +4493,10 @@
                 document.getElementById("correctionStatus");
             const submitButton =
                 document.getElementById("submitCorrectionButton");
+            const form =
+                document.getElementById("correctionForm");
+            const progress =
+                document.getElementById("correctionProgress");
             const original = window.ecoScanOriginal;
             const correctedLabel =
                 document.getElementById("correctedLabel").value.trim();
@@ -4449,7 +4513,13 @@
 
             submitButton.disabled = true;
             submitButton.textContent = "Saving correction...";
-            status.textContent = "";
+            form.setAttribute("aria-busy", "true");
+            progress.hidden = false;
+            progress.setAttribute(
+                "aria-valuetext",
+                "Sending correction to EcoScan"
+            );
+            status.textContent = "Sending correction to EcoScan...";
 
             try {
                 const response = await fetch(
@@ -4475,8 +4545,32 @@
                 );
 
                 if (!response.ok) {
-                    throw new Error(`Feedback save failed: ${response.status}`);
+                    let errorDetails = null;
+
+                    try {
+                        errorDetails = await response.json();
+                    } catch (parseError) {
+                        console.warn(
+                            "Could not read correction API error response:",
+                            parseError
+                        );
+                    }
+
+                    const error = new Error(
+                        errorDetails?.message ||
+                        `Feedback save failed: ${response.status}`
+                    );
+                    error.code = errorDetails?.code || "";
+                    error.status = response.status;
+                    throw error;
                 }
+
+                status.textContent =
+                    "Correction received. Updating the result...";
+                progress.setAttribute(
+                    "aria-valuetext",
+                    "Applying the saved correction"
+                );
 
                 const categoryActions = {
                     "Organic": ["Organic", "Compost", "Compost organic material when accepted locally."],
@@ -4518,11 +4612,24 @@
                 document.getElementById("confirmTextileButton").hidden = true;
                 status.textContent =
                     "Correction saved. Thank you for helping improve future EcoScan results.";
+                progress.hidden = true;
+                form.removeAttribute("aria-busy");
                 submitButton.textContent = "Correction saved";
             } catch (error) {
                 console.error("Correction save error:", error);
-                status.textContent =
-                    "Could not save this correction. Check the feedback table setup and try again.";
+                if (
+                    error.code === "PGRST205" ||
+                    error.message.includes("Could not find the table") ||
+                    error.message.includes("schema cache")
+                ) {
+                    status.textContent =
+                        "The correction table or one of its columns is missing. In your Supabase SQL Editor, run the latest supabase/scan_feedback.sql, then retry.";
+                } else {
+                    status.textContent =
+                        `Could not save this correction${error.status ? ` (HTTP ${error.status})` : ""}: ${error.message}`;
+                }
+                progress.hidden = true;
+                form.removeAttribute("aria-busy");
                 submitButton.disabled = false;
                 submitButton.textContent = "Submit correction";
             }

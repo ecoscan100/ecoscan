@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="Read and share public reviews of EcoScan."
+    >
+    <meta name="theme-color" content="#061810">
+    <link rel="icon" type="image/png" href="images/sman100-logo.png">
+    <link rel="stylesheet" href="css/style.css?v=20261013-reviews">
+    <title>EcoScan Reviews</title>
+    <style>
+        .reviews-page {
+            min-height: calc(100vh - 76px);
+            padding: 56px 20px 80px;
+            background:
+                radial-gradient(circle at 50% 0, rgba(47, 201, 120, 0.13), transparent 34rem),
+                #07130d;
+            color: #eef7f0;
+        }
+
+        .reviews-container {
+            width: min(100%, 850px);
+            margin: 0 auto;
+        }
+
+        .reviews-heading {
+            margin-bottom: 28px;
+            text-align: center;
+        }
+
+        .reviews-eyebrow {
+            color: #79e5a0;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .reviews-heading h1 {
+            margin: 10px 0;
+            color: #f2f8f4;
+            font-size: clamp(32px, 6vw, 48px);
+            letter-spacing: -1.5px;
+        }
+
+        .reviews-heading p {
+            max-width: 570px;
+            margin: 0 auto;
+            color: #a9c0b1;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .review-summary,
+        .review-form-card,
+        .review-card {
+            border: 1px solid rgba(147, 194, 162, 0.16);
+            border-radius: 16px;
+            background: rgba(15, 35, 24, 0.88);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.16);
+        }
+
+        .review-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+            padding: 18px 22px;
+        }
+
+        .review-summary-label {
+            color: #a9c0b1;
+            font-size: 12px;
+        }
+
+        .review-average {
+            margin-top: 3px;
+            color: #f2f8f4;
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .review-summary-stars,
+        .review-stars {
+            color: #ffd36a;
+            letter-spacing: 2px;
+        }
+
+        .review-count {
+            color: #a9c0b1;
+            font-size: 12px;
+        }
+
+        .review-form-card {
+            margin-bottom: 30px;
+            padding: 22px;
+        }
+
+        .review-form-card h2,
+        .reviews-list-heading h2 {
+            margin: 0;
+            color: #f2f8f4;
+            font-size: 18px;
+        }
+
+        .review-form-intro {
+            margin: 7px 0 18px;
+            color: #9bb5a5;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .review-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .review-field {
+            display: grid;
+            gap: 7px;
+            color: #c5d9cc;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .review-field input,
+        .review-field textarea {
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 9px;
+            background: rgba(3, 18, 11, 0.58);
+            color: #f2f8f4;
+            font: inherit;
+            font-weight: 400;
+        }
+
+        .review-field input {
+            min-height: 42px;
+            padding: 0 12px;
+        }
+
+        .review-field textarea {
+            min-height: 112px;
+            padding: 11px 12px;
+            resize: vertical;
+            line-height: 1.55;
+        }
+
+        .review-field input:focus,
+        .review-field textarea:focus {
+            outline: 2px solid rgba(121, 229, 160, 0.45);
+            outline-offset: 1px;
+        }
+
+        .review-rating {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        .review-rating legend {
+            margin-bottom: 7px;
+            color: #c5d9cc;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .review-rating-options {
+            display: flex;
+            gap: 5px;
+        }
+
+        .review-rating-option input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+
+        .review-rating-option span {
+            display: block;
+            padding: 3px;
+            color: #718579;
+            cursor: pointer;
+            font-size: 28px;
+            line-height: 1;
+            transition: color 120ms ease;
+        }
+
+        .review-rating-option.is-active span,
+        .review-rating-option input:focus-visible + span {
+            color: #ffd36a;
+        }
+
+        .review-rating-option input:focus-visible + span {
+            outline: 2px solid #79e5a0;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        .review-submit {
+            min-height: 44px;
+            border: 0;
+            border-radius: 9px;
+            background: linear-gradient(110deg, #238755, #2eaa68);
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .review-submit:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+        .review-form-status,
+        .reviews-status {
+            min-height: 1.4em;
+            margin: 0;
+            color: #9bb5a5;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .review-form-status[data-state="success"] {
+            color: #79e5a0;
+        }
+
+        .review-form-status[data-state="error"],
+        .reviews-status[data-state="error"] {
+            color: #ff9d9d;
+        }
+
+        .reviews-list-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 0 0 12px;
+        }
+
+        .reviews-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .review-card {
+            padding: 18px;
+        }
+
+        .review-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .reviewer-name {
+            color: #eef7f0;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .review-date {
+            margin-top: 4px;
+            color: #82998b;
+            font-size: 10px;
+        }
+
+        .review-stars {
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .review-text {
+            margin: 0;
+            color: #c0d3c6;
+            font-size: 12px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .reviews-sync-status {
+            color: #82998b;
+            font-size: 10px;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        @media (max-width: 520px) {
+            .reviews-page {
+                padding: 38px 14px 60px;
+            }
+
+            .review-summary {
+                align-items: flex-start;
+            }
+
+            .review-form-card,
+            .review-card {
+                padding: 16px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="brand">
+            <img
+                src="images/sman100-logo.png"
+                alt="SMAN 100 Jakarta Logo"
+                class="school-logo"
+                onerror="this.style.visibility='hidden';"
+            >
+            <div class="brand-text">
+                <div class="school-name">SMAN 100 JAKARTA</div>
+                <div class="eco-name">EcoScan</div>
+            </div>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="scan.html">Scan Waste</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="map.html">Impact Map</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="reviews.html" class="active" aria-current="page">Reviews</a></li>
+        </ul>
+    </nav>
+
+    <main class="reviews-page">
+        <div class="reviews-container">
+            <header class="reviews-heading">
+                <div class="reviews-eyebrow">Community feedback</div>
+                <h1>EcoScan Reviews</h1>
+                <p>Share what worked for you and help others know what to expect. Reviews are public as soon as they are posted.</p>
+            </header>
+
+            <section class="review-summary" aria-label="Review summary">
+                <div>
+                    <div class="review-summary-label">Community rating</div>
+                    <div class="review-average" id="reviewAverage">—</div>
+                    <div class="review-summary-stars" id="summaryStars" aria-hidden="true">☆☆☆☆☆</div>
+                </div>
+                <div class="review-count" id="reviewCount">Loading reviews…</div>
+            </section>
+
+            <section class="review-form-card" aria-labelledby="reviewFormTitle">
+                <h2 id="reviewFormTitle">Write a review</h2>
+                <p class="review-form-intro">Your review will be visible to everyone. Please don’t include private or sensitive information.</p>
+                <form class="review-form" id="reviewForm">
+                    <label class="review-field" for="reviewerName">
+                        Name <span>(optional)</span>
+                        <input id="reviewerName" name="display_name" maxlength="60" autocomplete="name" placeholder="Your name or nickname">
+                    </label>
+
+                    <fieldset class="review-rating">
+                        <legend>Your rating <span aria-hidden="true">*</span></legend>
+                        <div class="review-rating-options">
+                            <label class="review-rating-option">
+                                <input type="radio" name="rating" value="1" required aria-label="1 star">
+                                <span aria-hidden="true">★</span>
+                            </label>
+                            <label class="review-rating-option">
+                                <input type="radio" name="rating" value="2" required aria-label="2 stars">
+                                <span aria-hidden="true">★</span>
+                            </label>
+                            <label class="review-rating-option">
+                                <input type="radio" name="rating" value="3" required aria-label="3 stars">
+                                <span aria-hidden="true">★</span>
+                            </label>
+                            <label class="review-rating-option">
+                                <input type="radio" name="rating" value="4" required aria-label="4 stars">
+                                <span aria-hidden="true">★</span>
+                            </label>
+                            <label class="review-rating-option">
+                                <input type="radio" name="rating" value="5" required aria-label="5 stars">
+                                <span aria-hidden="true">★</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <label class="review-field" for="reviewText">
+                        Your review
+                        <textarea id="reviewText" name="review_text" maxlength="1200" required placeholder="What did you like? What could be better?"></textarea>
+                    </label>
+
+                    <button class="review-submit" id="reviewSubmit" type="submit">Publish review</button>
+                    <p class="review-form-status" id="reviewFormStatus" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <section aria-labelledby="reviewsListTitle">
+                <div class="reviews-list-heading">
+                    <h2 id="reviewsListTitle">Community reviews</h2>
+                </div>
+                <p class="reviews-sync-status" id="reviewsSyncStatus" role="status" aria-live="polite">Connecting live updates…</p>
+                <p class="reviews-status" id="reviewsStatus" role="status" aria-live="polite"></p>
+                <div class="reviews-list" id="reviewsList"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        const SUPABASE_URL = "https://wyehzlwukwbdfajzqtqv.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_qk5NHtgzibFwX8wyB2-OeQ_C2zQfpHd";
+        const PAGE_SIZE = 1000;
+
+        const supabaseClient =
+            window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const reviewsList =
+            document.getElementById("reviewsList");
+        const reviewsStatus =
+            document.getElementById("reviewsStatus");
+        const reviewForm =
+            document.getElementById("reviewForm");
+        const reviewFormStatus =
+            document.getElementById("reviewFormStatus");
+        const reviewSubmit =
+            document.getElementById("reviewSubmit");
+        let reviewRows = [];
+        let reviewsLoaded = false;
+
+        function setMessage(element, message, state) {
+            element.textContent = message;
+            if (state) {
+                element.dataset.state = state;
+            } else {
+                delete element.dataset.state;
+            }
+        }
+
+        function isReviewsSchemaError(error) {
+            return error?.code === "PGRST205" ||
+                error?.message?.includes("schema cache");
+        }
+
+        function formatReviewDate(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) {
+                return "Date unavailable";
+            }
+            return new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium"
+            }).format(date);
+        }
+
+        function updateRatingStars(rating) {
+            document
+                .querySelectorAll(".review-rating-option")
+                .forEach(function(option) {
+                    const input =
+                        option.querySelector("input");
+                    option.classList.toggle(
+                        "is-active",
+                        Number(input.value) <= rating
+                    );
+                });
+        }
+
+        function createReviewCard(review) {
+            const card = document.createElement("article");
+            card.className = "review-card";
+
+            const header = document.createElement("div");
+            header.className = "review-card-header";
+
+            const identity = document.createElement("div");
+            const name = document.createElement("div");
+            name.className = "reviewer-name";
+            name.textContent = review.display_name?.trim() || "EcoScan visitor";
+
+            const date = document.createElement("div");
+            date.className = "review-date";
+            date.textContent = formatReviewDate(review.created_at);
+            identity.append(name, date);
+
+            const stars = document.createElement("div");
+            stars.className = "review-stars";
+            const rating =
+                Math.max(1, Math.min(5, Number(review.rating) || 1));
+            stars.textContent =
+                `${"★".repeat(rating)}${"☆".repeat(5 - rating)}`;
+            stars.setAttribute("aria-label", `${rating} out of 5 stars`);
+            header.append(identity, stars);
+
+            const text = document.createElement("p");
+            text.className = "review-text";
+            text.textContent = review.review_text;
+            card.append(header, text);
+
+            return card;
+        }
+
+        function renderReviews() {
+            if (!reviewsLoaded) {
+                document.getElementById("reviewAverage").textContent = "—";
+                document.getElementById("summaryStars").textContent = "☆☆☆☆☆";
+                document.getElementById("reviewCount").textContent =
+                    reviewRows.length
+                        ? `${reviewRows.length} reviews`
+                        : "Loading reviews…";
+                if (reviewRows.length === 0) {
+                    reviewsList.replaceChildren();
+                }
+                return;
+            }
+
+            const count = reviewRows.length;
+            document.getElementById("reviewCount").textContent =
+                `${count} ${count === 1 ? "review" : "reviews"}`;
+
+            if (count === 0) {
+                document.getElementById("reviewAverage").textContent = "—";
+                document.getElementById("summaryStars").textContent = "☆☆☆☆☆";
+                const empty = document.createElement("p");
+                empty.className = "review-card review-text";
+                empty.textContent = "No reviews yet. Be the first to share your experience.";
+                reviewsList.replaceChildren(empty);
+                return;
+            }
+
+            const average =
+                reviewRows.reduce(
+                    (total, review) => total + Number(review.rating),
+                    0
+                ) / count;
+            document.getElementById("reviewAverage").textContent =
+                average.toFixed(1);
+            document.getElementById("summaryStars").textContent =
+                `${"★".repeat(Math.round(average))}${"☆".repeat(5 - Math.round(average))}`;
+            reviewsList.replaceChildren(
+                ...reviewRows.map(createReviewCard)
+            );
+        }
+
+        async function loadReviews() {
+            reviewsStatus.textContent = "Loading reviews…";
+            document.getElementById("reviewCount").textContent =
+                "Loading reviews…";
+            const rows = [];
+            let start = 0;
+
+            try {
+                while (true) {
+                    const { data, error } = await supabaseClient
+                        .from("ecoscan_reviews")
+                        .select("id, display_name, rating, review_text, created_at")
+                        .order("created_at", { ascending: false })
+                        .range(start, start + PAGE_SIZE - 1);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    rows.push(...data);
+                    if (data.length < PAGE_SIZE) {
+                        break;
+                    }
+                    start += PAGE_SIZE;
+                }
+
+                reviewRows = rows;
+                reviewsLoaded = true;
+                setMessage(reviewsStatus, "");
+                renderReviews();
+            } catch (error) {
+                console.error("Could not load reviews:", error);
+                if (!reviewsLoaded) {
+                    document.getElementById("reviewCount").textContent =
+                        "Reviews unavailable";
+                    reviewsList.replaceChildren();
+                }
+                setMessage(
+                    reviewsStatus,
+                    isReviewsSchemaError(error)
+                        ? "The reviews table is not set up yet. Run supabase/ecoscan_reviews.sql in your Supabase SQL Editor."
+                        : "Could not load reviews. Check your connection and try again.",
+                    "error"
+                );
+            }
+        }
+
+        document
+            .querySelector(".review-rating-options")
+            .addEventListener("change", function(event) {
+                if (event.target.name === "rating") {
+                    updateRatingStars(Number(event.target.value));
+                }
+            });
+
+        reviewForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            if (!reviewForm.reportValidity()) {
+                return;
+            }
+
+            const formData = new FormData(reviewForm);
+            const rating = Number(formData.get("rating"));
+            const reviewText = String(formData.get("review_text") || "").trim();
+            const displayName = String(formData.get("display_name") || "").trim();
+
+            if (reviewText.length === 0 || reviewText.length > 1200) {
+                setMessage(
+                    reviewFormStatus,
+                    "Please enter a review of up to 1,200 characters.",
+                    "error"
+                );
+                return;
+            }
+
+            reviewSubmit.disabled = true;
+            reviewSubmit.textContent = "Publishing…";
+            setMessage(reviewFormStatus, "Publishing your review…");
+
+            try {
+                const { error } = await supabaseClient
+                    .from("ecoscan_reviews")
+                    .insert({
+                        display_name: displayName || null,
+                        rating,
+                        review_text: reviewText
+                    });
+
+                if (error) {
+                    throw error;
+                }
+
+                reviewForm.reset();
+                updateRatingStars(0);
+                await loadReviews();
+                setMessage(
+                    reviewFormStatus,
+                    "Your review is published and visible to everyone.",
+                    "success"
+                );
+            } catch (error) {
+                console.error("Could not publish review:", error);
+                setMessage(
+                    reviewFormStatus,
+                    isReviewsSchemaError(error)
+                        ? "The reviews table is not set up yet. Run supabase/ecoscan_reviews.sql in your Supabase SQL Editor."
+                        : `Could not publish your review: ${error.message}`,
+                    "error"
+                );
+            } finally {
+                reviewSubmit.disabled = false;
+                reviewSubmit.textContent = "Publish review";
+            }
+        });
+
+        function subscribeToReviewChanges() {
+            const syncStatus =
+                document.getElementById("reviewsSyncStatus");
+
+            supabaseClient
+                .channel("ecoscan-reviews-live")
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "*",
+                        schema: "public",
+                        table: "ecoscan_reviews"
+                    },
+                    function(payload) {
+                        if (payload.eventType === "DELETE") {
+                            const deletedId =
+                                String(payload.old.id);
+                            reviewRows =
+                                reviewRows.filter(function(review) {
+                                    return String(review.id) !== deletedId;
+                                });
+                            renderReviews();
+                            return;
+                        }
+
+                        const changedReview =
+                            payload.new;
+                        const changedId =
+                            String(changedReview.id);
+                        const existingIndex =
+                            reviewRows.findIndex(function(review) {
+                                return String(review.id) === changedId;
+                            });
+
+                        if (existingIndex >= 0) {
+                            reviewRows[existingIndex] =
+                                changedReview;
+                        } else {
+                            reviewRows.push(changedReview);
+                        }
+
+                        reviewRows.sort(function(left, right) {
+                            return new Date(right.created_at) -
+                                new Date(left.created_at);
+                        });
+                        reviewsLoaded = true;
+                        renderReviews();
+                    }
+                )
+                .subscribe(function(status, error) {
+                    if (status === "SUBSCRIBED") {
+                        syncStatus.textContent =
+                            "Live updates connected.";
+                    } else if (
+                        status === "CHANNEL_ERROR" ||
+                        status === "TIMED_OUT"
+                    ) {
+                        console.error(
+                            "Live review updates unavailable:",
+                            error
+                        );
+                        syncStatus.textContent =
+                            "Live updates unavailable. Reload to get the latest reviews.";
+                    } else if (status === "CLOSED") {
+                        syncStatus.textContent =
+                            "Live updates disconnected. Reload to get the latest reviews.";
+                    }
+                });
+        }
+
+        subscribeToReviewChanges();
+        loadReviews();
+    </script>
+</body>
+</html>

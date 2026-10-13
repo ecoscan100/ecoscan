@@ -113,8 +113,8 @@ nav {
 .nav-links {
     display: grid;
     align-items: center;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    width: min(100%, 560px);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    width: min(100%, 620px);
     gap: 2px;
 
     list-style: none;
@@ -170,6 +170,10 @@ nav {
 
 .nav-links a[href="about.html"]::before {
     content: "ⓘ";
+}
+
+.nav-links a[href="reviews.html"]::before {
+    content: "★";
 }
 
 .nav-links a:hover {
@@ -837,7 +841,7 @@ section {
     }
 
     .nav-links {
-        gap: 18px;
+        gap: 3px;
     }
 
     .hero {
