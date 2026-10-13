@@ -35,7 +35,7 @@ jobs:
           fi
 
           mkdir -p _site/js
-          cp index.html about.html dashboard.html map.html result.html scan.html _site/
+          cp index.html about.html dashboard.html map.html result.html scan.html reviews.html _site/
           cp -R css images _site/
           cp js/google-map-adapter.js js/script.js _site/js/
 
