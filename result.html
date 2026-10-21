@@ -3287,19 +3287,6 @@
                             </button>
 
 
-                            <button
-                                type="button"
-                                class="result-button save-button confirm-textile-button"
-                                id="confirmTextileButton"
-                                onclick="confirmTextileClassification()"
-                                hidden
-                            >
-
-                                Confirm discarded clothing
-
-                            </button>
-
-
                         </div>
 
 
@@ -4082,13 +4069,10 @@
                         "Anorganic",
 
                     action:
-                        "Confirm textile item",
-
-                    requiresConfirmation:
-                        true,
+                        "Reuse or Recycle",
 
                     recommendation:
-                        "The image classifier may be recognizing clothing you are wearing. Confirm this is a discarded clothing item before saving it as waste."
+                        "If this clothing is no longer needed, consider repairing, donating, swapping, or using a textile recycling program."
 
                 };
 
@@ -4345,16 +4329,6 @@
                     classification.recommendation;
 
                 document.getElementById(
-                    "saveButton"
-                ).disabled = !isWasteItem;
-
-                document.getElementById(
-                    "impactButton"
-                ).style.display = isWasteItem
-                    ? ""
-                    : "none";
-
-                document.getElementById(
                     "findCollectionButton"
                 ).style.display = isWasteItem
                     ? ""
@@ -4363,10 +4337,6 @@
                 document.getElementById(
                     "reuseIdeasButton"
                 ).disabled = !isWasteItem;
-
-                document.getElementById(
-                    "confirmTextileButton"
-                ).hidden = !classification.requiresConfirmation;
 
                 renderReuseIdeas(
                     aiLabel,
@@ -4390,7 +4360,7 @@
 
                 /* CURRENT SCAN */
 
-                window.currentScan = isWasteItem && !classification.requiresConfirmation ? {
+                window.currentScan = isWasteItem ? {
 
                     wasteName:
                         aiLabel,
@@ -4414,6 +4384,16 @@
                         massEstimate.estimateGrams
 
                 } : null;
+
+                document.getElementById(
+                    "saveButton"
+                ).disabled = !window.currentScan;
+
+                document.getElementById(
+                    "impactButton"
+                ).style.display = window.currentScan
+                    ? ""
+                    : "none";
 
                 document.getElementById(
                     "aiStoragePanel"
@@ -4609,7 +4589,6 @@
                 document.getElementById("impactButton").style.display = "";
                 document.getElementById("findCollectionButton").style.display = "";
                 document.getElementById("reuseIdeasButton").disabled = false;
-                document.getElementById("confirmTextileButton").hidden = true;
                 status.textContent =
                     "Correction saved. Thank you for helping improve future EcoScan results.";
                 progress.hidden = true;
@@ -4636,51 +4615,6 @@
 
         }
 
-
-        function confirmTextileClassification() {
-
-            const wasteName =
-                document.getElementById("objectName").textContent;
-            const confidence =
-                Number(
-                    document.getElementById("confidenceValue")
-                        .textContent
-                        .replace("%", "")
-                ) / 100;
-            const category =
-                "Reusable";
-            const action =
-                "Reuse or Recycle";
-
-            document.getElementById("material").textContent =
-                "Textile";
-            document.getElementById("category").textContent =
-                category;
-            document.getElementById("action").textContent =
-                action;
-            document.getElementById("recommendationText").textContent =
-                "If this discarded item is still usable, consider donating or reusing it. Otherwise, look for a textile recycling program.";
-            document.getElementById("saveButton").disabled = false;
-            document.getElementById("impactButton").style.display = "";
-            document.getElementById("findCollectionButton").style.display = "";
-            document.getElementById("reuseIdeasButton").disabled = false;
-            document.getElementById("confirmTextileButton").hidden = true;
-            document.getElementById("saveStatus").textContent =
-                "Confirmed as discarded clothing. Save the result to continue.";
-
-            window.currentScan = {
-                wasteName,
-                category,
-                action,
-                confidence,
-                material: "Textile",
-                estimatedMass: document.getElementById("estimatedMass").textContent,
-                estimatedMassGrams: Number(
-                    document.getElementById("correctedMass").value
-                )
-            };
-
-        }
 
         async function keepAIOnDevice() {
 
@@ -4874,7 +4808,7 @@
 
 
                     throw new Error(
-                        `Save failed: ${response.status}`
+                        `Save failed (HTTP ${response.status}): ${errorText}`
                     );
 
                 }
@@ -4914,7 +4848,7 @@
 
 
                 status.textContent =
-                    "Unable to save the result. Please try again.";
+                    `Unable to save the result: ${error.message}`;
 
             }
 
